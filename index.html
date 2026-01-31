@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts: Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Playfair+Display:ital,wght@1,400&display=swap"
+        rel="stylesheet">
+    <title>Nimbus Radio</title>
+    <style>
+        :root {
+            /* Colors */
+            --bg-color: #e0f2fe;
+            --text-color: #0f172a;
+            --text-secondary: #475569;
+            --card-bg: rgba(255, 255, 255, 0.4);
+            --card-border: rgba(255, 255, 255, 0.8);
+            --card-hover: rgba(255, 255, 255, 0.6);
+            --accent-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --highlight-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+            --nimbus-gradient: linear-gradient(90deg, #4facfe 0%, #f687b3 100%);
+
+            /* Spacing */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 2rem;
+            --space-lg: 4rem;
+
+            /* Layout */
+            --max-width: 1200px;
+            --card-radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: radial-gradient(circle at top center, #e0f2fe 0%, #f0f9ff 100%);
+            background-color: #f0f9ff;
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Ambient Glow Background */
+        .ambient-glow {
+            position: fixed;
+            top: -20vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80vw;
+            height: 80vh;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.15) 0%, rgba(11, 11, 15, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .ambient-glow-2 {
+            position: fixed;
+            bottom: -20vh;
+            right: -10vw;
+            width: 60vw;
+            height: 60vh;
+            background: radial-gradient(circle, rgba(246, 135, 179, 0.1) 0%, rgba(11, 11, 15, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: var(--max-width);
+            padding: var(--space-md);
+            padding-bottom: 180px;
+            /* Prevent player overlap */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: var(--space-lg);
+            margin-top: var(--space-md);
+        }
+
+        .logo {
+            max-width: 300px;
+            height: auto;
+            margin-bottom: var(--space-xs);
+            opacity: 1;
+            filter: drop-shadow(0 0 15px rgba(79, 172, 254, 0.6)) drop-shadow(0 0 5px rgba(0, 0, 0, 0.1));
+            transition: filter 0.3s ease;
+        }
+
+        p.tagline {
+            color: var(--text-secondary);
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            margin-top: -10px;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--card-radius);
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: center;
+            z-index: 2;
+            transition: transform 0.3s;
+        }
+
+        /* Card Hover */
+        .card:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(79, 172, 254, 0.15), rgba(246, 135, 179, 0.15));
+            background-size: 200% 200%;
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            animation: liquidFlow 3s ease infinite;
+        }
+
+        @keyframes liquidFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Active State */
+        .card.active {
+            border-color: rgba(79, 172, 254, 0.6);
+            box-shadow: 0 0 30px rgba(79, 172, 254, 0.25);
+            background: rgba(79, 172, 254, 0.1);
+        }
+
+        .card.active h2 {
+            font-weight: 600;
+            background: var(--nimbus-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        footer {
+            margin-top: var(--space-lg);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            opacity: 0.8;
+            padding-bottom: 2rem;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+
+        /* Player Placeholder */
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem;
+            background: rgba(11, 11, 15, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 100;
+        }
+
+        .player-bar.visible {
+            transform: translateY(0);
+        }
+
+        /* Player UI Updates */
+        .player-bar {
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            height: 80px;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .play-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .play-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .play-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #fff;
+            margin-left: 2px;
+            /* Visual center adjustment for play icon */
+        }
+
+        .play-btn.playing svg {
+            margin-left: 0;
+        }
+
+        .track-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .station-name {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.2rem;
+            font-weight: 500;
+        }
+
+        .song-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+            text-shadow: 0 0 10px rgba(79, 172, 254, 0.3);
+        }
+
+        @media (min-width: 600px) {
+            .song-title {
+                max-width: 400px;
+            }
+        }
+
+        /* Visualizer Cleanup - Removed small visualizer styles */
+
+        /* Main Horizontal Wave Equalizer */
+        .wave-equalizer {
+            position: absolute;
+            bottom: 100%;
+            /* Sit directly on top of player */
+            left: 0;
+            width: 100%;
+            height: 60px;
+            /* Taller */
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 4px;
+            /* Better spacing */
+            padding: 0 2rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 90;
+            /* Fade out at top */
+            -webkit-mask-image: linear-gradient(to top, black 20%, transparent 100%);
+            mask-image: linear-gradient(to top, black 20%, transparent 100%);
+        }
+
+        .wave-equalizer.active {
+            opacity: 1;
+        }
+
+        .wave-bar {
+            width: 6px;
+            background: linear-gradient(to top, #4facfe, #f687b3);
+            /* Stronger blue-pink */
+            border-radius: 4px 4px 0 0;
+            height: 4px;
+            transition: height 0.15s ease;
+            box-shadow: 0 0 15px rgba(79, 172, 254, 0.5);
+            /* Glow */
+        }
+
+        .wave-equalizer.active .wave-bar {
+            animation: waveBounce 1s ease-in-out infinite;
+        }
+
+        @keyframes waveBounce {
+
+            0%,
+            100% {
+                height: 10px;
+            }
+
+            50% {
+                height: 50px;
+            }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            .player-bar {
+                flex-direction: row;
+                padding: 1rem;
+            }
+
+            .wave-equalizer {
+                height: 40px;
+                /* Slightly smaller on mobile */
+            }
+
+            @keyframes waveBounce {
+
+                0%,
+                100% {
+                    height: 8px;
+                }
+
+                50% {
+                    height: 35px;
+                }
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                height: 70px;
+                /* More compact on mobile */
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow-2"></div>
+
+    <div class="container">
+        <header>
+            <img src="logo.png" alt="Nimbus Radio" class="logo">
+            <p class="tagline">Sound for every mood</p>
+        </header>
+
+        <div class="grid" id="categoryGrid">
+            <!-- Categories will be injected here -->
+        </div>
+
+        <footer>
+            &copy; 2026 Nimbus Radio. All rights reserved &middot; v1.0
+        </footer>
+    </div>
+
+    <div class="player-bar" id="playerBar">
+        <!-- Main Equalizer attached ABOVE player -->
+        <div class="wave-equalizer" id="mainEqualizer">
+            <!-- Bars injected by JS -->
+        </div>
+
+        <div class="player-controls">
+            <button class="play-btn" id="playBtn">
+                <!-- Play Icon -->
+                <svg viewBox="0 0 24 24" id="playIcon">
+                    <path d="M8 5v14l11-7z" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="track-info">
+            <div class="station-name" id="stationName">Nimbus Radio</div>
+            <div class="song-title" id="songTitle">Select a Category</div>
+        </div>
+
+        <!-- Removed small visualizer -->
+    </div>
+
+    <!-- Hidden Audio Element -->
+    <audio id="audioPlayer"></audio>
+
+    <script>
+        const categories = [
+            "70s Music",
+            "80s Music",
+            "90s Music",
+            "00s Music",
+            "Today's Top Hits",
+            "Classical & Instrumental",
+            "Relax and Spiritual",
+            "Electronic",
+            "Música en Español"
+        ];
+
+        // Stream Map - Reliable Public Streams
+        const streamMap = {
+            "70s Music": "https://strm112.1.fm/70s_128", // Dedicated 70s
+            "80s Music": "https://listen.181fm.com/181-awesome80s_128k.mp3",
+            "90s Music": "https://streams.ilovemusic.de/iloveradio24.mp3",
+            "00s Music": "https://streams.ilovemusic.de/iloveradio37.mp3",
+            "Today's Top Hits": "https://listen.181fm.com/181-power_128k.mp3",
+            "Classical & Instrumental": "https://live.musopen.org:8085/streamvbr0",
+            "Relax and Spiritual": "https://streams.ilovemusic.de/iloveradio17.mp3",
+            "Electronic": "https://streams.ilovemusic.de/iloveradio2.mp3",
+            "Música en Español": "https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_ASO_MORON.mp3"
+        };
+
+        const grid = document.getElementById('categoryGrid');
+        const playerBar = document.getElementById('playerBar');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const stationNameEl = document.getElementById('stationName');
+        const songTitleEl = document.getElementById('songTitle');
+        const mainEqualizer = document.getElementById('mainEqualizer');
+
+        let activeCard = null;
+        let isPlaying = false;
+        let currentStreamUrl = "";
+
+        // Generate Wave Bars - Increased count for wider visual
+        const barCount = 40;
+        for (let i = 0; i < barCount; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'wave-bar';
+            // Randomize animation delays for "living" feel
+            bar.style.animationDelay = `${Math.random() * 1.5}s`; // Varied start
+            bar.style.animationDuration = `${0.6 + Math.random() * 0.8}s`; // Varied speed
+            mainEqualizer.appendChild(bar);
+        }
+
+        // Icons
+        const ICON_PLAY = '<path d="M8 5v14l11-7z"/>';
+        const ICON_PAUSE = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+
+        // Initialize Cards
+        categories.forEach(category => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<h2>${category}</h2>`;
+
+            card.addEventListener('click', (e) => {
+                selectCategory(card, category);
+                createRipple(e, card);
+            });
+
+            grid.appendChild(card);
+        });
+
+        // Player Event Listeners
+        playBtn.addEventListener('click', togglePlay);
+
+        audioPlayer.addEventListener('playing', () => {
+            updatePlayerState(true);
+            updateMetadataState("Playing");
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            updatePlayerState(false);
+            updateMetadataState("Paused");
+        });
+
+        audioPlayer.addEventListener('error', (e) => {
+            console.error("Audio Error:", e);
+            songTitleEl.textContent = "Stream Unavailable";
+            updatePlayerState(false);
+        });
+
+        // Media Session API Support
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.setActionHandler('play', togglePlay);
+            navigator.mediaSession.setActionHandler('pause', togglePlay);
+            navigator.mediaSession.setActionHandler('stop', stopPlayback);
+        }
+
+        function selectCategory(card, categoryName) {
+            // Update Visual Active State
+            if (activeCard) activeCard.classList.remove('active');
+
+            if (activeCard !== card) {
+                card.classList.add('active');
+                activeCard = card;
+
+                // Show Player
+                playerBar.classList.add('visible');
+
+                // Load and Play
+                loadAndPlay(categoryName);
+            } else {
+                // Toggling off (Stop)
+                activeCard = null;
+                stopPlayback();
+                playerBar.classList.remove('visible');
+            }
+        }
+
+        function loadAndPlay(categoryName) {
+            stationNameEl.textContent = categoryName;
+            songTitleEl.textContent = "Connecting...";
+
+            const url = streamMap[categoryName];
+
+            if (url) {
+                currentStreamUrl = url;
+                audioPlayer.src = url;
+                audioPlayer.load();
+
+                updateMediaSession(categoryName, "Connecting...");
+
+                // Play
+                audioPlayer.play().catch(e => {
+                    console.log("Autoplay prevented or stream error", e);
+                    songTitleEl.textContent = "Click to Play";
+                    updatePlayerState(false);
+                });
+            } else {
+                songTitleEl.textContent = "Stream Offline";
+            }
+        }
+
+        function stopPlayback() {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            updatePlayerState(false);
+            stationNameEl.textContent = "Nimbus Radio";
+            songTitleEl.textContent = "Stopped";
+
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = "none";
+            }
+        }
+
+        function togglePlay() {
+            if (audioPlayer.paused) {
+                if (audioPlayer.src) {
+                    audioPlayer.play();
+                } else if (activeCard) {
+                    // Retry loading content if needed
+                    const cat = activeCard.innerText;
+                    loadAndPlay(cat);
+                }
+            } else {
+                audioPlayer.pause();
+            }
+        }
+
+        function updateMetadataState(status) {
+            if (status === "Playing") {
+                songTitleEl.textContent = "Live Radio";
+            } else {
+                songTitleEl.textContent = status;
+            }
+
+            if (activeCard) {
+                updateMediaSession(activeCard.innerText, songTitleEl.textContent);
+            }
+        }
+
+        function updateMediaSession(station, status) {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: station,
+                    artist: "Nimbus Radio",
+                    album: status,
+                    artwork: [
+                        { src: 'logo.png', sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+                navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
+            }
+        }
+
+        function updatePlayerState(playing) {
+            isPlaying = playing;
+
+            // Toggle Icon
+            playIcon.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+
+            // Toggle Visualizer
+            if (playing) {
+                mainEqualizer.classList.add('active');
+                playBtn.classList.add('playing');
+            } else {
+                mainEqualizer.classList.remove('active');
+                playBtn.classList.remove('playing');
+            }
+
+            if (activeCard) {
+                updateMediaSession(activeCard.innerText, songTitleEl.textContent);
+            }
+        }
+
+        function createRipple(event, element) {
+            const circle = document.createElement("span");
+            const diameter = Math.max(element.clientWidth, element.clientHeight);
+            const radius = diameter / 2;
+
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - element.getBoundingClientRect().left - radius}px`;
+            circle.style.top = `${event.clientY - element.getBoundingClientRect().top - radius}px`;
+            circle.classList.add("ripple");
+
+            const ripple = element.getElementsByClassName("ripple")[0];
+
+            if (ripple) {
+                ripple.remove();
+            }
+
+            element.appendChild(circle);
+        }
+    </script>
+</body>
+
+</html>
