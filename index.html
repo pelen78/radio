@@ -248,15 +248,32 @@
             opacity: 0.25;
         }
 
-        .card:hover h2 {
-            transform: translateX(4px);
-        }
+
 
         /* Active State */
         .card.active {
-            border-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4), var(--glass-shadow);
-            background: rgba(255, 255, 255, 0.45);
+            border-color: #38bdf8 !important;
+            /* Force Bright Blue */
+            background: rgba(14, 165, 233, 0.25) !important;
+            /* Stronger Light Blue Tint */
+            transform: scale(0.98);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
+            animation: pulseBlue 2s infinite alternate;
+        }
+
+        .card.active::before {
+            opacity: 0.1;
+            /* Reduce white overlay so blue shows through */
+        }
+
+        @keyframes pulseBlue {
+            0% {
+                box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+            }
+
+            100% {
+                box-shadow: 0 0 25px rgba(56, 189, 248, 0.5);
+            }
         }
 
         .card.active h2 {
@@ -408,7 +425,8 @@
 
         .station-name {
             font-size: 0.8rem;
-            color: #64748b;
+            color: #38bdf8;
+            /* Light Blue for Visibility */
             text-transform: uppercase;
             letter-spacing: 1.5px;
             margin-bottom: 0.2rem;
@@ -613,20 +631,7 @@
     <!-- Hidden Audio Element -->
     <audio id="audioPlayer"></audio>
 
-    <script>
-        const categories = [
-            { name: "70s Music", id: "70s Music", sub: "Vintage Vibes & Disco" },
-            { name: "80s Music", id: "80s Music", sub: "Neon Nights & Synth" },
-            { name: "90s Music", id: "90s Music", sub: "Pop Culture & Grunge" },
-            { name: "00s Music", id: "00s Music", sub: "The Y2K Era" },
-            { name: "Today's Top Hits", id: "Today's Top Hits", sub: "Chart Toppers" },
-            { name: "Classical & Instrumental", id: "Classical & Instrumental", sub: "Pure Focus & Calm" },
-            { name: "Relax Music", id: "Relax Music", sub: "Mindfulness & Zen" },
-            { name: "Electronic Music", id: "Electronic Music", sub: "Future Beats & Bass" },
-            { name: "Música en Español", id: "Música en Español", sub: "Ritmo Latino" }
-        ];
-
-     // Stream Map - Reliable Public Streams
+   // Stream Map - Reliable Public Streams
         const streamMap = {
             "70s Music": "https://pureplay.cdnstream1.com/6011_128.mp3", // Dedicated 70s
             "80s Music": "https://listen.181fm.com/181-awesome80s_128k.mp3",
@@ -639,6 +644,19 @@
             "Música en Español": "https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_ASO_MORON.mp3"
         };
 
+
+        // Stream Map - Reliable Public Streams
+        const streamMap = {
+            "70s Music": "https://strm112.1.fm/70s_128", // Dedicated 70s
+            "80s Music": "https://listen.181fm.com/181-awesome80s_128k.mp3",
+            "90s Music": "https://streams.ilovemusic.de/iloveradio24.mp3",
+            "00s Music": "https://streams.ilovemusic.de/iloveradio37.mp3",
+            "Today's Top Hits": "https://listen.181fm.com/181-power_128k.mp3",
+            "Classical & Instrumental": "https://listen.181fm.com/181-classical_128k.mp3",
+            "Relax Music": "https://streams.ilovemusic.de/iloveradio17.mp3",
+            "Electronic Music": "https://25553.live.streamtheworld.com/OWR_INTERNATIONAL.mp3",
+            "Música en Español": "https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_ASO_MORON.mp3"
+        };
 
         const grid = document.getElementById('categoryGrid');
         const playerBar = document.getElementById('playerBar');
@@ -675,7 +693,7 @@
         categories.forEach(cat => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.style.background = "var(--card-bg)"; // Default glass bg instead of gradient
+            // Removed inline background to allow CSS .active state to work
 
             card.innerHTML = `
                 <div class="card-content">
@@ -758,8 +776,29 @@
             }
         }
 
+        const stationMetadata = {
+            "70s Music": "1.FM - Absolute 70s Pop",
+            "80s Music": "181.FM - Awesome 80s",
+            "90s Music": "I Love Radio - 90s & Trash",
+            "00s Music": "I Love Radio - 2000s Throwbacks",
+            "Today's Top Hits": "181.FM - Power 181",
+            "Classical & Instrumental": "181.FM - Classical Greats",
+            "Relax Music": "I Love Radio - Chill & Relax",
+            "Electronic Music": "I Love Radio - Electronic",
+            "Música en Español": "LOS40 - Urban & Latin"
+        };
+
+        let currentStationSlogan = "";
+
         function loadAndPlay(categoryName) {
-            stationNameEl.textContent = categoryName;
+            // Get specific station name or fallback to category name
+            const realStationName = stationMetadata[categoryName] || categoryName;
+
+            // Get slogan (subtitle) for "Now Playing" info
+            const categoryObj = categories.find(c => c.name === categoryName);
+            currentStationSlogan = categoryObj ? categoryObj.sub : "Live Stream";
+
+            stationNameEl.textContent = realStationName;
             songTitleEl.textContent = "Connecting...";
 
             const url = streamMap[categoryName];
@@ -769,7 +808,7 @@
                 audioPlayer.src = url;
                 audioPlayer.load();
 
-                updateMediaSession(categoryName, "Connecting...");
+                updateMediaSession(realStationName, "Connecting...");
 
                 // Play
                 audioPlayer.play().catch(e => {
@@ -787,7 +826,7 @@
             audioPlayer.currentTime = 0;
             updatePlayerState(false);
             stationNameEl.textContent = "Nimbus Radio";
-            songTitleEl.textContent = "Stopped";
+            songTitleEl.textContent = "Select a Category";
 
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.playbackState = "none";
@@ -811,7 +850,7 @@
 
         function updateMetadataState(status) {
             if (status === "Playing") {
-                songTitleEl.textContent = "Live Radio";
+                songTitleEl.textContent = currentStationSlogan;
             } else {
                 songTitleEl.textContent = status;
             }
