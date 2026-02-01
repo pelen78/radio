@@ -11,18 +11,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Playfair+Display:ital,wght@1,400&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Playfair+Display:ital,wght@1,400&family=Outfit:wght@500;600;700&family=Nunito:wght@400;500;600&family=Fraunces:ital,opsz,wght@1,9..144,300..900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <title>Nimbus Radio</title>
     <style>
         :root {
             /* Colors */
             --bg-color: #e0f2fe;
-            --text-color: #0f172a;
-            --text-secondary: #475569;
-            --card-bg: rgba(255, 255, 255, 0.4);
-            --card-border: rgba(255, 255, 255, 0.8);
-            --card-hover: rgba(255, 255, 255, 0.6);
+            --text-color: #fff;
+            /* White text for glass theme */
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --card-bg: rgba(255, 255, 255, 0.25);
+            --card-border: rgba(255, 255, 255, 0.4);
+            --card-hover: rgba(255, 255, 255, 0.35);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --card-glow: 0 0 20px rgba(255, 255, 255, 0.3);
             --accent-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
             --highlight-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
             --nimbus-gradient: linear-gradient(90deg, #4facfe 0%, #f687b3 100%);
@@ -47,8 +50,8 @@
         }
 
         body {
-            background: radial-gradient(circle at top center, #e0f2fe 0%, #f0f9ff 100%);
-            background-color: #f0f9ff;
+            background: url('/Users/pelen/.gemini/antigravity/brain/6a3a385f-0c4f-4d6c-97d4-5c549322e563/glass_background_1769967512257.png') no-repeat center center fixed;
+            background-size: cover;
             color: var(--text-color);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             min-height: 100vh;
@@ -112,22 +115,46 @@
             transition: filter 0.3s ease;
         }
 
-        p.tagline {
-            color: var(--text-secondary);
-            font-family: 'Playfair Display', serif;
+        .tagline {
+            font-family: 'Fraunces', serif;
+            /* Aesthetic font */
             font-style: italic;
             font-size: 1.5rem;
-            font-weight: 400;
-            letter-spacing: 0.5px;
-            margin-top: -10px;
+            /* Bigger size */
+            color: #334155;
+            /* Darker for visibility */
+            letter-spacing: 0.02em;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+            /* Subtle light glow for contrast */
+            font-weight: 600;
+            /* Slightly bolder for impact */
+            animation: floatText 5s ease-in-out infinite;
+        }
+
+        @keyframes floatText {
+
+            0%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.9;
+            }
+
+            50% {
+                transform: translateY(-4px);
+                opacity: 1;
+                text-shadow: 0 4px 8px rgba(255, 255, 255, 0.6);
+            }
         }
 
         /* Grid */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(3, 1fr);
+            /* Fixed 3 columns */
+            gap: 2rem;
             width: 100%;
+            max-width: 1100px;
             perspective: 1000px;
         }
 
@@ -135,69 +162,111 @@
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: var(--card-radius);
-            padding: 1.2rem;
+            border-radius: 24px;
+            padding: 1.5rem;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 80px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            justify-content: flex-end;
+            /* Text at bottom */
+            height: 140px;
+            /* Reduced height for text-only */
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Inner Glow */
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.2);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--card-gradient, linear-gradient(135deg, #fff 0%, #f0f2f5 100%));
+            opacity: 0.15;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+
+
+        .card-content {
+            z-index: 2;
+            width: 100%;
+            margin-top: auto;
         }
 
         .card h2 {
-            font-family: 'Manrope', sans-serif;
-            font-size: 1.2rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            /* Slightly larger for Outfit */
             font-weight: 600;
-            letter-spacing: 0.5px;
-            text-align: center;
-            z-index: 2;
+            letter-spacing: -0.01em;
+            text-align: left;
+            color: #1e293b;
+            /* Darker Slate for visibility */
+            margin-bottom: 0.3rem;
             transition: transform 0.3s;
+        }
+
+        .card .subtitle {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.95rem;
+            color: #475569;
+            /* Darker secondary text */
+            opacity: 0.95;
+            font-weight: 500;
+            letter-spacing: 0;
         }
 
         /* Card Hover */
         .card:hover {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(79, 172, 254, 0.15), rgba(246, 135, 179, 0.15));
-            background-size: 200% 200%;
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.4);
-            animation: liquidFlow 3s ease infinite;
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-color: rgba(255, 255, 255, 0.8);
         }
 
-        @keyframes liquidFlow {
-            0% {
-                background-position: 0% 50%;
-            }
+        .card:hover::before {
+            opacity: 0.3;
+        }
 
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
+        .card:hover h2 {
+            transform: translateX(4px);
         }
 
         /* Active State */
         .card.active {
-            border-color: rgba(79, 172, 254, 0.6);
-            box-shadow: 0 0 30px rgba(79, 172, 254, 0.25);
-            background: rgba(79, 172, 254, 0.1);
+            border-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4), var(--glass-shadow);
+            background: rgba(255, 255, 255, 0.45);
         }
 
         .card.active h2 {
-            font-weight: 600;
-            background: var(--nimbus-gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #0f172a;
+            /* Dark text for active state */
+            text-shadow: none;
         }
+
+        .card.active .subtitle {
+            color: #334155;
+            opacity: 1;
+        }
+
 
         footer {
             margin-top: var(--space-lg);
@@ -205,7 +274,8 @@
             color: var(--text-secondary);
             font-size: 0.85rem;
             opacity: 0.8;
-            padding-bottom: 2rem;
+            padding-bottom: 8rem;
+            /* Added padding to prevent player overlap */
         }
 
         .ripple {
@@ -217,27 +287,33 @@
             pointer-events: none;
         }
 
-        /* Player Placeholder */
+        /* Player Placeholder - Floating Pill */
         .player-bar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 1.5rem;
-            background: rgba(11, 11, 15, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--card-border);
+            bottom: 2rem;
+            /* Floating */
+            left: 50%;
+            transform: translateX(-50%) translateY(150%);
+            width: 90%;
+            max-width: 800px;
+            padding: 0.8rem 2rem;
+            background: rgba(20, 20, 30, 0.65);
+            /* Darker glass */
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            /* Pill shape */
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            transform: translateY(100%);
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 100;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
         }
 
         .player-bar.visible {
-            transform: translateY(0);
+            transform: translateX(-50%) translateY(0);
         }
 
         /* Player UI Updates */
@@ -283,6 +359,41 @@
 
         .play-btn.playing svg {
             margin-left: 0;
+        }
+
+        /* Mute Button */
+        .mute-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            color: rgba(255, 255, 255, 0.9);
+            margin-left: 0.5rem;
+            /* Space from Play button */
+        }
+
+        .mute-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .mute-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            transition: fill 0.3s ease;
+        }
+
+        .mute-btn.muted {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .track-info {
@@ -380,6 +491,8 @@
             .player-bar {
                 flex-direction: row;
                 padding: 1rem;
+                height: auto;
+                /* Allow height to adjust if needed */
             }
 
             .wave-equalizer {
@@ -431,9 +544,9 @@
             }
 
             .card {
-                height: 70px;
-                /* More compact on mobile */
-                padding: 1rem;
+                height: 100px;
+                /* Slightly smaller on mobile but tall enough */
+                padding: 1.2rem;
             }
 
             .container {
@@ -451,7 +564,7 @@
     <div class="container">
         <header>
             <img src="logo.png" alt="Nimbus Radio" class="logo">
-            <p class="tagline">Sound for every mood</p>
+            <p class="tagline">Sound for Every Mood</p>
         </header>
 
         <div class="grid" id="categoryGrid">
@@ -459,7 +572,7 @@
         </div>
 
         <footer>
-            &copy; 2026 Nimbus Radio. All rights reserved &middot; v1.0
+            &copy; 2026 Nimbus Radio. All rights reserved &middot; v2.0
         </footer>
     </div>
 
@@ -474,6 +587,14 @@
                 <!-- Play Icon -->
                 <svg viewBox="0 0 24 24" id="playIcon">
                     <path d="M8 5v14l11-7z" />
+                </svg>
+            </button>
+
+            <!-- Mute Button -->
+            <button class="mute-btn" id="muteBtn" aria-label="Mute">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
                 </svg>
             </button>
         </div>
@@ -491,15 +612,15 @@
 
     <script>
         const categories = [
-            "70s Music",
-            "80s Music",
-            "90s Music",
-            "00s Music",
-            "Today's Top Hits",
-            "Classical & Instrumental",
-            "Relax and Spiritual",
-            "Electronic",
-            "Música en Español"
+            { name: "70s Music", id: "70s Music", sub: "Vintage Vibes & Disco" },
+            { name: "80s Music", id: "80s Music", sub: "Neon Nights & Synth" },
+            { name: "90s Music", id: "90s Music", sub: "Pop Culture & Grunge" },
+            { name: "00s Music", id: "00s Music", sub: "The Y2K Era" },
+            { name: "Today's Top Hits", id: "Today's Top Hits", sub: "Chart Toppers" },
+            { name: "Classical & Instrumental", id: "Classical & Instrumental", sub: "Pure Focus & Calm" },
+            { name: "Relax Music", id: "Relax Music", sub: "Mindfulness & Zen" },
+            { name: "Electronic Music", id: "Electronic Music", sub: "Future Beats & Bass" },
+            { name: "Música en Español", id: "Música en Español", sub: "Ritmo Latino" }
         ];
 
         // Stream Map - Reliable Public Streams
@@ -519,6 +640,7 @@
         const playerBar = document.getElementById('playerBar');
         const audioPlayer = document.getElementById('audioPlayer');
         const playBtn = document.getElementById('playBtn');
+        const muteBtn = document.getElementById('muteBtn');
         const playIcon = document.getElementById('playIcon');
         const stationNameEl = document.getElementById('stationName');
         const songTitleEl = document.getElementById('songTitle');
@@ -542,15 +664,24 @@
         // Icons
         const ICON_PLAY = '<path d="M8 5v14l11-7z"/>';
         const ICON_PAUSE = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+        const ICON_VOL_UP = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+        const ICON_VOL_OFF = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
 
         // Initialize Cards
-        categories.forEach(category => {
+        categories.forEach(cat => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.innerHTML = `<h2>${category}</h2>`;
+            card.style.background = "var(--card-bg)"; // Default glass bg instead of gradient
+
+            card.innerHTML = `
+                <div class="card-content">
+                    <h2>${cat.name}</h2>
+                    <p class="subtitle">${cat.sub}</p>
+                </div>
+            `;
 
             card.addEventListener('click', (e) => {
-                selectCategory(card, category);
+                selectCategory(card, cat.name);
                 createRipple(e, card);
             });
 
@@ -559,6 +690,7 @@
 
         // Player Event Listeners
         playBtn.addEventListener('click', togglePlay);
+        muteBtn.addEventListener('click', toggleMute);
 
         audioPlayer.addEventListener('playing', () => {
             updatePlayerState(true);
@@ -585,9 +717,8 @@
 
         function selectCategory(card, categoryName) {
             // Update Visual Active State
-            if (activeCard) activeCard.classList.remove('active');
-
             if (activeCard !== card) {
+                if (activeCard) activeCard.classList.remove('active');
                 card.classList.add('active');
                 activeCard = card;
 
@@ -598,6 +729,7 @@
                 loadAndPlay(categoryName);
             } else {
                 // Toggling off (Stop)
+                card.classList.remove('active');
                 activeCard = null;
                 stopPlayback();
                 playerBar.classList.remove('visible');
@@ -646,8 +778,9 @@
                     audioPlayer.play();
                 } else if (activeCard) {
                     // Retry loading content if needed
-                    const cat = activeCard.innerText;
-                    loadAndPlay(cat);
+                    // Find name from h2 since structure changed
+                    const catName = activeCard.querySelector('h2').innerText;
+                    loadAndPlay(catName);
                 }
             } else {
                 audioPlayer.pause();
@@ -662,7 +795,8 @@
             }
 
             if (activeCard) {
-                updateMediaSession(activeCard.innerText, songTitleEl.textContent);
+                const catName = activeCard.querySelector('h2').innerText;
+                updateMediaSession(catName, songTitleEl.textContent);
             }
         }
 
@@ -696,7 +830,24 @@
             }
 
             if (activeCard) {
-                updateMediaSession(activeCard.innerText, songTitleEl.textContent);
+                const catName = activeCard.querySelector('h2').innerText;
+                updateMediaSession(catName, songTitleEl.textContent);
+            }
+        }
+
+        function toggleMute() {
+            audioPlayer.muted = !audioPlayer.muted;
+            updateMuteState(audioPlayer.muted);
+        }
+
+        function updateMuteState(isMuted) {
+            const icon = isMuted ? ICON_VOL_OFF : ICON_VOL_UP;
+            muteBtn.innerHTML = `<svg viewBox="0 0 24 24">${icon}</svg>`;
+            muteBtn.setAttribute('aria-label', isMuted ? "Unmute" : "Mute");
+            if (isMuted) {
+                muteBtn.classList.add('muted');
+            } else {
+                muteBtn.classList.remove('muted');
             }
         }
 
