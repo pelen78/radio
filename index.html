@@ -119,48 +119,36 @@
             font-family: 'Fraunces', serif;
             /* Aesthetic font */
             font-style: italic;
-            font-size: 1.5rem;
-            /* Bigger size */
-            color: #334155;
-            /* Darker for visibility */
+            font-size: 1.7rem;
+            /* Slightly larger for impact */
+
+            /* Deep Glossy Nimbus Blue Gradient */
+            background: linear-gradient(135deg, #60a5fa 0%, #2563eb 50%, #1e3a8a 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+
+            /* Glassy/Glossy Shine */
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+
             letter-spacing: 0.02em;
             margin-bottom: 2rem;
-            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
-            /* Subtle light glow for contrast */
-            font-weight: 600;
-            /* Slightly bolder for impact */
-            animation: fadeInFloat 6s ease-in-out infinite;
-            opacity: 0;
-            animation-fill-mode: forwards;
+            font-weight: 700;
+
+            /* Gentle Shine Only (No Floating) */
+            animation: shine 6s linear infinite;
+            opacity: 1;
         }
 
-        @keyframes fadeInFloat {
-            0% {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            15% {
-                opacity: 0.9;
-                transform: translateY(0);
-            }
-
-            50% {
-                opacity: 1;
-                transform: translateY(-4px);
-                text-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
-            }
-
-            85% {
-                opacity: 0.9;
-                transform: translateY(0);
-            }
-
-            100% {
-                opacity: 0.9;
-                transform: translateY(0);
+        @keyframes shine {
+            to {
+                background-position: 200% center;
             }
         }
+
+
 
         /* Grid */
         .grid {
@@ -638,7 +626,7 @@
             { name: "Música en Español", id: "Música en Español", sub: "Ritmo Latino" }
         ];
 
-        // Stream Map - Reliable Public Streams
+     // Stream Map - Reliable Public Streams
         const streamMap = {
             "70s Music": "https://pureplay.cdnstream1.com/6011_128.mp3", // Dedicated 70s
             "80s Music": "https://listen.181fm.com/181-awesome80s_128k.mp3",
@@ -650,6 +638,7 @@
             "Electronic Music": "https://25553.live.streamtheworld.com/OWR_INTERNATIONAL.mp3",
             "Música en Español": "https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_ASO_MORON.mp3"
         };
+
 
         const grid = document.getElementById('categoryGrid');
         const playerBar = document.getElementById('playerBar');
