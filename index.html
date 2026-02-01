@@ -574,6 +574,223 @@
                 padding: 1rem;
             }
         }
+
+        /* Feedback Panel Styles - v3 */
+        .feedback-float {
+            position: fixed;
+            top: 2rem;
+            bottom: auto;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 95;
+            /* Below player (100) but above content */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-float:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(2px);
+            /* Push down visual */
+            color: #fff;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .feedback-float svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        @media (max-width: 600px) {
+            .feedback-float {
+                bottom: auto;
+                top: 1rem;
+                right: 1rem;
+                background: rgba(20, 20, 30, 0.4);
+                /* Darker context on mobile header */
+            }
+        }
+
+        .feedback-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .feedback-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .feedback-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(30, 41, 59, 0.95);
+            /* Dark Slate Glass */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 2rem;
+            z-index: 1001;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feedback-panel.active {
+            transform: translateY(0);
+        }
+
+        @media (min-width: 600px) {
+            .feedback-panel {
+                width: 450px;
+                left: 50%;
+                bottom: 2rem;
+                transform: translate(-50%, 120%);
+                border-radius: 24px;
+            }
+
+            .feedback-panel.active {
+                transform: translate(-50%, 0);
+            }
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-header h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+            height: 120px;
+            margin-bottom: 0.5rem;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #38bdf8;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Removed Tag Styles for Simplification */
+
+        .submit-feedback-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .submit-feedback-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+        }
+
+        .submit-feedback-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .panel-success {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30, 41, 59, 0.98);
+            border-radius: inherit;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .panel-success.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-icon {
+            width: 48px;
+            height: 48px;
+            color: #4ade80;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 
@@ -593,7 +810,7 @@
         </div>
 
         <footer>
-            &copy; 2026 Nimbus Radio. All rights reserved &middot; v2.0
+            &copy; 2026 Nimbus Radio. All rights reserved &middot; v3.0
         </footer>
     </div>
 
@@ -618,6 +835,7 @@
                         d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
                 </svg>
             </button>
+
         </div>
 
         <div class="track-info">
@@ -628,8 +846,49 @@
         <!-- Removed small visualizer -->
     </div>
 
+    <!-- New Floating Feedback Trigger -->
+    <button class="feedback-float" id="feedbackTrigger" aria-label="Submit Feedback">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+            </path>
+        </svg>
+        <span>Feedback</span>
+    </button>
     <!-- Hidden Audio Element -->
     <audio id="audioPlayer"></audio>
+
+    <!-- Feedback Panel Overlay -->
+    <div class="feedback-overlay" id="feedbackOverlay"></div>
+
+    <!-- Feedback Panel -->
+    <div class="feedback-panel" id="feedbackPanel">
+        <div class="panel-header">
+            <h3>Help shape Nimbus Radio</h3>
+            <button class="close-btn" id="closeFeedback">&times;</button>
+        </div>
+
+        <div class="panel-body">
+            <form id="feedbackForm">
+                <textarea id="feedbackInput" name="message" placeholder="What's on your mind? We'd love to hear it..."
+                    maxlength="200" required></textarea>
+                <div class="char-count" id="charCount">0/200</div>
+
+                <!-- Categories Removed -->
+
+                <button type="button" class="submit-feedback-btn" id="submitFeedbackBtn">Send suggestion</button>
+            </form>
+        </div>
+
+        <!-- Success State -->
+        <div class="panel-success" id="panelSuccess">
+            <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <p>Thanks! We're listening.</p>
+        </div>
+    </div>
 
     <script>
         const categories = [
@@ -644,7 +903,7 @@
             { name: "Música en Español", id: "Música en Español", sub: "Ritmo Latino" }
         ];
 
-      // Stream Map - Reliable Public Streams
+        // Stream Map - Reliable Public Streams
         const streamMap = {
             "70s Music": "https://pureplay.cdnstream1.com/6011_128.mp3", // Dedicated 70s
             "80s Music": "https://listen.181fm.com/181-awesome80s_128k.mp3",
@@ -656,7 +915,6 @@
             "Electronic Music": "https://25553.live.streamtheworld.com/OWR_INTERNATIONAL.mp3",
             "Música en Español": "https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_ASO_MORON.mp3"
         };
-
 
         const grid = document.getElementById('categoryGrid');
         const playerBar = document.getElementById('playerBar');
@@ -930,6 +1188,109 @@
 
             element.appendChild(circle);
         }
+
+        // --- Feedback Panel Logic ---
+        const feedbackTrigger = document.getElementById('feedbackTrigger');
+        const feedbackOverlay = document.getElementById('feedbackOverlay');
+        const feedbackPanel = document.getElementById('feedbackPanel');
+        const closeFeedback = document.getElementById('closeFeedback');
+        const feedbackInput = document.getElementById('feedbackInput');
+        const charCount = document.getElementById('charCount');
+        const feedbackForm = document.getElementById('feedbackForm');
+        const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+        const panelSuccess = document.getElementById('panelSuccess');
+
+        // FORMSPREE CONFIGURATION
+        // REPLACE THIS STRING WITH YOUR ACTUAL FORMSPREE FORM ID
+        // Register at https://formspree.io to get one to send to hi@pelen13.com
+        // FORMSPREE CONFIGURATION
+        const FORMSPREE_ID = "mrelklpw";
+
+        function openFeedback() {
+            feedbackOverlay.classList.add('active');
+            feedbackPanel.classList.add('active');
+            feedbackInput.focus();
+        }
+
+        function closeFeedbackPanel() {
+            feedbackOverlay.classList.remove('active');
+            feedbackPanel.classList.remove('active');
+            // Reset after transition
+            setTimeout(() => {
+                panelSuccess.classList.remove('visible');
+                feedbackInput.value = '';
+                charCount.textContent = '0/200';
+                submitFeedbackBtn.textContent = 'Send suggestion';
+                submitFeedbackBtn.disabled = false;
+            }, 400);
+        }
+
+        feedbackTrigger.addEventListener('click', openFeedback);
+        closeFeedback.addEventListener('click', closeFeedbackPanel);
+        feedbackOverlay.addEventListener('click', closeFeedbackPanel);
+
+        // Character Count
+        feedbackInput.addEventListener('input', () => {
+            const current = feedbackInput.value.length;
+            charCount.textContent = `${current}/200`;
+        });
+
+        // Submit Logic (Click Handler for better reliability)
+        submitFeedbackBtn.addEventListener('click', async (e) => {
+            e.preventDefault(); // Prevent default form submission
+
+            if (feedbackInput.value.trim().length === 0) {
+                feedbackInput.focus();
+                // Visual shake or error border could go here
+                feedbackInput.style.borderColor = '#ef4444';
+                setTimeout(() => feedbackInput.style.borderColor = 'rgba(255, 255, 255, 0.1)', 1000);
+                return;
+            }
+
+            // UI Loading State
+            submitFeedbackBtn.disabled = true;
+            submitFeedbackBtn.textContent = 'Sending...';
+
+            // Prepare Data (Standard FormData)
+            const formData = new FormData(feedbackForm);
+
+            try {
+                // Send to Formspree (No Content-Type header, browser handles boundary)
+                const submitPromise = fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                // 10s Timeout limit
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Request timeout')), 10000)
+                );
+
+                const response = await Promise.race([submitPromise, timeoutPromise]);
+
+                if (response.ok) {
+                    panelSuccess.classList.add('visible');
+                    // Auto close after success
+                    setTimeout(closeFeedbackPanel, 2000);
+                } else {
+                    console.error("Formspree Error:", response.status);
+                    alert("Unable to send. Please check your connection.");
+                    resetButton();
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Something went wrong. Please try again.");
+                resetButton();
+            }
+
+            function resetButton() {
+                submitFeedbackBtn.disabled = false;
+                submitFeedbackBtn.textContent = 'Send suggestion';
+            }
+        });
     </script>
 </body>
 
