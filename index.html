@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="icon" href="/favicon2.png" type="image/png">
     <link rel="apple-touch-icon" href="/favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -129,6 +129,37 @@
             /* Subtle light glow for contrast */
             font-weight: 600;
             /* Slightly bolder for impact */
+            animation: fadeInFloat 6s ease-in-out infinite;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes fadeInFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            15% {
+                opacity: 0.9;
+                transform: translateY(0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translateY(-4px);
+                text-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
+            }
+
+            85% {
+                opacity: 0.9;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0.9;
+                transform: translateY(0);
+            }
         }
 
         /* Grid */
@@ -220,13 +251,13 @@
 
         /* Card Hover */
         .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
-            border-color: rgba(255, 255, 255, 0.8);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(255, 255, 255, 0.2), 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-color: rgba(255, 255, 255, 0.6);
         }
 
         .card:hover::before {
-            opacity: 0.3;
+            opacity: 0.25;
         }
 
         .card:hover h2 {
@@ -615,8 +646,8 @@
             "00s Music": "https://streams.ilovemusic.de/iloveradio37.mp3",
             "Today's Top Hits": "https://listen.181fm.com/181-power_128k.mp3",
             "Classical & Instrumental": "https://listen.181fm.com/181-classical_128k.mp3",
-            "Relax and Spiritual": "https://streams.ilovemusic.de/iloveradio17.mp3",
-            "Electronic": "https://streams.ilovemusic.de/iloveradio2.mp3",
+            "Relax Music": "https://streams.ilovemusic.de/iloveradio17.mp3",
+            "Electronic Music": "https://25553.live.streamtheworld.com/OWR_INTERNATIONAL.mp3",
             "Música en Español": "https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_ASO_MORON.mp3"
         };
 
@@ -698,6 +729,24 @@
             navigator.mediaSession.setActionHandler('pause', togglePlay);
             navigator.mediaSession.setActionHandler('stop', stopPlayback);
         }
+
+        // Automatic Theme Detection
+        function checkTheme() {
+            const hour = new Date().getHours();
+            // Dark mode from 7 PM (19:00) to 7 AM (07:00)
+            const isDark = hour >= 19 || hour < 7;
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+
+        // Initial check
+        checkTheme();
+        // Check every minute
+        setInterval(checkTheme, 60000);
+
 
         function selectCategory(card, categoryName) {
             // Update Visual Active State
