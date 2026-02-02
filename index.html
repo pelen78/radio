@@ -5,16 +5,16 @@
 
 <head>
     <!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YWPCDH69CZ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YWPCDH69CZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-  gtag('config', 'G-YWPCDH69CZ', {
-    debug_mode: true
-  });
-</script>
+        gtag('config', 'G-YWPCDH69CZ', {
+            debug_mode: true
+        });
+    </script>
 
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.png" type="image/png">
@@ -983,6 +983,7 @@
         });
 
         // Player Event Listeners
+
         playBtn.addEventListener('click', togglePlay);
         muteBtn.addEventListener('click', toggleMute);
 
@@ -1069,6 +1070,13 @@
         let currentStationSlogan = "";
 
         function loadAndPlay(categoryName) {
+            // Analytics: station change
+            if (typeof gtag === 'function') {
+                gtag('event', 'station_change', {
+                    station: categoryName
+                });
+            }
+
             // Get specific station name or fallback to category name
             const realStationName = stationMetadata[categoryName] || categoryName;
 
