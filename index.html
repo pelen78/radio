@@ -972,6 +972,12 @@
         playBtn.addEventListener('click', togglePlay);
         muteBtn.addEventListener('click', toggleMute);
 
+        audioPlayer.addEventListener('play', () => {
+            if (typeof gtag === 'function') {
+                gtag('event', 'play_radio');
+            }
+        });
+
         audioPlayer.addEventListener('playing', () => {
             updatePlayerState(true);
             updateMetadataState("Playing");
