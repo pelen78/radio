@@ -611,9 +611,16 @@ function loadStation(s) {
 
 function doPlay() {
   initCtx();
-  if (actx.state === 'suspended') actx.resume();
-  audio.play().catch(()=>{});
-  isPlaying = true;
+  if (actx && actx.state === 'suspended') actx.resume();
+  const playPromise = audio.play();
+  if (playPromise) {
+    playPromise.then(() => {
+      isPlaying = true;
+      if (actx && actx.state === 'suspended') actx.resume();
+    }).catch(()=>{});
+  } else {
+    isPlaying = true;
+  }
   document.getElementById('iPlay').style.display = 'none';
   document.getElementById('iPause').style.display = '';
 }
@@ -642,6 +649,26 @@ document.getElementById('btnPrev').onclick = () => {
   });
   loadStation(prev);
 };
+
+// ensure isPlaying syncs with actual audio state (critical for mobile)
+audio.addEventListener('playing', () => {
+  isPlaying = true;
+  if (actx && actx.state === 'suspended') actx.resume();
+});
+audio.addEventListener('pause', () => { isPlaying = false; });
+audio.addEventListener('waiting', () => { /* buffering - keep isPlaying true */ });
+
+// iOS/Android AudioContext unlock on first touch
+document.addEventListener('touchstart', function unlockAudio() {
+  if (actx && actx.state === 'suspended') actx.resume();
+  if (!actx) {
+    // pre-init on touch so it's ready when play is hit
+    try {
+      actx = new (window.AudioContext||window.webkitAudioContext)();
+    } catch(e) {}
+  }
+  document.removeEventListener('touchstart', unlockAudio);
+}, { once: true });
 
 audio.addEventListener('ended', () => {
   const i = STATIONS.findIndex(s => s.id === currentId);
