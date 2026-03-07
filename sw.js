@@ -17,12 +17,16 @@ const SHELL = [
 // ── Install: cache the app shell ──────────────
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(SHELL);
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL))
   );
-  // Take control immediately without waiting for old SW to finish
-  self.skipWaiting();
+  // NO skipWaiting aquí — esperamos que el usuario confirme
+});
+
+// ── El usuario tocó "Actualizar" en el banner ──
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // ── Activate: clean up old caches ─────────────
@@ -40,13 +44,10 @@ self.addEventListener('activate', event => {
 });
 
 // ── Fetch strategy ────────────────────────────
-// Audio streams → always network (never cache streams)
-// App shell    → cache-first, then network fallback
-// Everything else → network-first, then cache fallback
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Never intercept audio streams — let them go straight to network
+  // Never intercept audio streams
   const isAudioStream =
     event.request.destination === 'audio' ||
     url.pathname.endsWith('.mp3') ||
@@ -62,12 +63,9 @@ self.addEventListener('fetch', event => {
     url.hostname.includes('rfienespagnol') ||
     url.hostname.includes('npr-ice');
 
-  if (isAudioStream) {
-    // Pass through — don't even respond, let browser handle it
-    return;
-  }
+  if (isAudioStream) return;
 
-  // App shell files → cache-first
+  // App shell → cache-first
   const isShell = SHELL.some(path => url.pathname.endsWith(path.replace(/^\//, '')));
   if (isShell) {
     event.respondWith(
@@ -87,7 +85,6 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Cache successful GET responses
         if (event.request.method === 'GET' && response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
