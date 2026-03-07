@@ -12,8 +12,35 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .catch(() => {}); // silently fail if offline
+      navigator.serviceWorker.register('/sw.js').then(reg => {
+        // Check for updates every time the page gets focus
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New version ready — show update banner
+              showUpdateBanner(newWorker);
+            }
+          });
+        });
+      }).catch(() => {});
+
+      // If SW controller changes (new SW took over), reload automatically
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) { refreshing = true; window.location.reload(); }
+      });
+    });
+  }
+
+  function showUpdateBanner(worker) {
+    const banner = document.getElementById('updateBanner');
+    const btnUpdate = document.getElementById('btnUpdate');
+    if (!banner) return;
+    banner.classList.add('show');
+    btnUpdate.addEventListener('click', () => {
+      banner.classList.remove('show');
+      worker.postMessage({ type: 'SKIP_WAITING' });
     });
   }
 </script>
@@ -372,6 +399,39 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
   .fp-cats{grid-template-columns:repeat(2,1fr);}
   .fp-name{font-size:1.4rem;}
   .fp-art{height:160px;}
+}
+
+/* UPDATE BANNER */
+#updateBanner{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--surface);border:1px solid var(--accent);
+  border-radius:16px;padding:12px 18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 40px rgba(123,94,167,.3);
+  font-family:var(--fm);font-size:.78rem;color:var(--text);
+  opacity:0;pointer-events:none;z-index:900;
+  transition:opacity .3s ease, transform .3s ease;
+  white-space:nowrap;
+}
+#updateBanner.show{
+  opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);
+}
+#btnUpdate{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:10px;padding:7px 14px;
+  font-family:var(--fm);font-size:.72rem;font-weight:700;
+  color:#fff;cursor:pointer;letter-spacing:.04em;
+  transition:opacity .15s;
+}
+#btnUpdate:hover{opacity:.85;}
+#btnDismiss{
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);padding:4px;display:flex;
+  transition:color .15s;
+}
+#btnDismiss:hover{color:var(--text);}
+@media(max-width:500px){
+  #updateBanner{bottom:20px;font-size:.72rem;}
 }
 
 /* FOOTER */
@@ -1169,6 +1229,15 @@ if (muteBtn) {
     <p>Thanks! We're listening.</p>
   </div>
 </div>
+
+  <!-- UPDATE BANNER -->
+  <div id="updateBanner">
+    <span>✨ Nueva versión disponible</span>
+    <button id="btnUpdate">Actualizar</button>
+    <button id="btnDismiss" onclick="document.getElementById('updateBanner').classList.remove('show')" title="Cerrar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+  </div>
 
 </body>
 </html>
