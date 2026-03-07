@@ -1,23 +1,38 @@
 {
-    "name": "Nimbus Radio",
-    "short_name": "Nimbus",
-    "description": "Nimbus Radio – modern online radio experience",
-    "start_url": "/",
-    "scope": "/",
-    "display": "standalone",
-    "orientation": "portrait",
-    "background_color": "#000000",
-    "theme_color": "#2a6df5",
-    "icons": [
-        {
-            "src": "/icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "/icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ]
+  "name": "Nimbus Radio",
+  "short_name": "Nimbus Radio",
+  "description": "Curated internet radio — every mood, every vibe.",
+  "start_url": "/nimbus-radio.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#06060a",
+  "theme_color": "#06060a",
+  "categories": ["music", "entertainment"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "70s Music",
+      "url": "/nimbus-radio.html#70s",
+      "description": "Play 70s Music"
+    },
+    {
+      "name": "Electronic Music",
+      "url": "/nimbus-radio.html#electronic",
+      "description": "Play Electronic Music"
+    }
+  ]
 }
