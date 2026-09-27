@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
+
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,10 +13,15 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then(reg => {
-        // Check for updates every time the page gets focus
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        if (reg.waiting) showUpdateBanner(reg.waiting);
+        // A waiting worker may already exist when this page opens.
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) reg.update().catch(() => {});
+        });
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
+          if (!newWorker) return;
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               // New version ready — show update banner
@@ -26,9 +32,10 @@
       }).catch(() => {});
 
       // If SW controller changes (new SW took over), reload automatically
+      const hadController = Boolean(navigator.serviceWorker.controller);
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) { refreshing = true; window.location.reload(); }
+        if (hadController && !refreshing) { refreshing = true; window.location.reload(); }
       });
     });
   }
@@ -38,15 +45,16 @@
     const btnUpdate = document.getElementById('btnUpdate');
     if (!banner) return;
     banner.classList.add('show');
-    btnUpdate.addEventListener('click', () => {
+    btnUpdate.onclick = () => {
       banner.classList.remove('show');
       worker.postMessage({ type: 'SKIP_WAITING' });
-    });
+    };
   }
 </script>
 <meta name="theme-color" content="#06060a">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nimbus Radio</title>
+<title>Nimbus Radio · Find your frequency</title>
+<meta name="description" content="Find your frequency. Live radio for focus, slow mornings, late nights and everything in between.">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -413,6 +421,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
   transition:opacity .3s ease, transform .3s ease;
   white-space:nowrap;
 }
+#updateBanner:not(.show){visibility:hidden;}
 #updateBanner.show{
   opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);
 }
@@ -557,9 +566,199 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
   object-fit: contain;
   filter: drop-shadow(0 0 8px rgba(123,94,167,.6));
 }
+
+/* Nimbus refinement — preserve the original night-radio identity. */
+:root { --muted:#aba5bb; --accent:#b091df; --border:rgba(177,158,218,.23); }
+button, a, input, textarea { -webkit-tap-highlight-color:transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline:2px solid #80ddd5; outline-offset:5px; }
+.skip-link { position:fixed;top:10px;left:20px;z-index:2000;padding:12px;background:#80ddd5;color:#06060a;transform:translateY(-160%); }
+.skip-link:focus { transform:none; }
+nav { padding-block:22px; }
+.hero { padding-top:56px;padding-bottom:32px; }
+.hero-eye { font-size:.63rem;letter-spacing:.16em;margin-bottom:22px; }
+.hero h1 { font-size:clamp(3rem,7vw,5.3rem);max-width:950px;line-height:1.02; }
+.hero-sub { font-size:.82rem;line-height:1.85;margin-bottom:24px;max-width:620px; }
+.hero-actions { display:flex;align-items:center;gap:12px; }
+.hero-actions button { min-height:50px;display:flex;align-items:center;justify-content:center;gap:12px;padding:0 23px;font:700 .8rem var(--fd);cursor:pointer;border-radius:999px;transition:transform .18s,background .18s; }
+.listen-button { background:#83ded4;color:#091613;border:1px solid #83ded4; }
+.listen-button:hover { background:#a0eee6;transform:translateY(-2px); }
+.surprise-button { background:transparent;color:var(--text);border:1px solid var(--border); }
+.surprise-button:hover { background:var(--surface2); }
+.surprise-button span { color:var(--accent);font-size:1.2rem; }
+.mood-section { margin-top:42px; }
+.mood-label { color:var(--muted);font:400 .65rem var(--fm);margin-bottom:15px; }
+.moods { display:grid;grid-template-columns:repeat(4,1fr);gap:12px; }
+.mood { display:flex;align-items:center;gap:13px;text-align:left;min-width:0;min-height:86px;padding:17px;border-radius:15px;background:rgba(20,19,30,.72);border:1px solid var(--border);color:var(--text);font:700 .86rem var(--fd);cursor:pointer;transition:border-color .2s,background .2s; }
+.mood small { display:block;font:400 .53rem var(--fm);color:var(--muted);margin-top:7px;line-height:1.5; }
+.mood-icon { color:#c2a5e9;font:400 1.7rem var(--fm); }
+.mood:nth-child(2) .mood-icon { color:#83ded4; }
+.mood:nth-child(3) .mood-icon { color:#edbf85; }
+.mood:nth-child(4) .mood-icon { color:#e5a5bb; }
+.mood-arrow { margin-left:auto;color:var(--muted);font-size:1rem; }
+.mood:hover,.mood[aria-pressed=true] { border-color:#83ded4;background:rgba(79,195,195,.06); }
+.content { display:flex;flex-direction:column; }
+.player-card { order:-1;margin-bottom:36px;border-radius:20px;box-shadow:0 18px 70px #0003; }
+.pc-body { grid-template-columns:220px 1fr;min-height:260px; }
+.pc-main { padding:27px 32px 15px;min-width:0; }
+.pc-name { font-size:1.65rem; }
+.pc-meta { margin-top:4px;font-size:.65rem; }
+.pc-live { font-size:.59rem;letter-spacing:.09em;padding-right:24px;margin-bottom:10px;min-height:20px; }
+.pc-eq { height:36px;margin:18px 0; }
+.pc-play,.fp-play { background:#8b68b9;box-shadow:0 0 25px #7b5ea72b; }
+.pc-controls { margin-bottom:10px; }
+.pc-btn,.fp-btn,#muteBtn { min-height:44px;min-width:44px;align-items:center;justify-content:center; }
+.pc-prog { margin-bottom:0; }
+.pc-bar { pointer-events:none; }
+.pc-expand-btn,.fp-close { min-height:40px;min-width:40px; }
+.dot-live { animation:none;opacity:.5; }
+body[data-playback=playing] .dot-live { opacity:1;box-shadow:0 0 10px var(--accent2); }
+body[data-playback=error] .playback-status { color:#ffb5b5; }
+.slabel { font-size:.63rem;letter-spacing:.14em;margin-bottom:17px; }
+.station-count { letter-spacing:0;color:var(--muted);font-size:.59rem;text-transform:none; }
+.cats { justify-content:flex-start;margin-bottom:0;gap:10px; }
+.cat { min-height:44px;color:#d0cada;padding:11px 17px;font-size:.76rem;transition:border-color .2s,background .2s; }
+.cat-dot { font-size:.45rem;color:#b091df;margin-right:3px; }
+.cat.active { background:#b99adb;color:#130d1f;box-shadow:none; }
+.cat.active .cat-dot { color:inherit; }
+.fp-overlay:not(.open),.fb-panel:not(.active),.fb-overlay:not(.active),.fb-success:not(.visible) { visibility:hidden; }
+.fp-modal { max-height:calc(100dvh - 32px);overflow-y:auto; }
+.fp-cat { min-height:44px; }
+footer { padding-bottom:80px; }
+.feedback-float { color:#d0cada;background:#1b1726;min-height:40px; }
+@media(max-width:800px) {
+  .hero { padding-top:35px;padding-bottom:25px; }
+  .hero h1 { font-size:clamp(2.7rem,9.5vw,4.2rem); }
+  .hero-sub { font-size:.73rem; }
+  .moods { grid-template-columns:repeat(2,1fr);gap:10px; }
+  .mood-section { margin-top:30px; }
+  .mood { min-height:80px;padding:14px; }
+  .mood small { font-size:.54rem; }
+  .pc-body { grid-template-columns:150px 1fr;min-height:240px; }
+  .pc-art { height:auto;border-right:1px solid var(--border);border-bottom:0; }
+  .pc-main { padding:24px 18px 18px;gap:0; }
+  .pc-name { font-size:1.15rem; }
+  .pc-controls { gap:4px; }
+  .pc-eq { margin:12px 0; }
+  .cats { display:flex; }
+  .cat { white-space:normal;text-align:left; }
+  .content { padding-bottom:36px; }
+}
+@media(max-width:500px) {
+  html { font-size:17px; }
+  nav { padding:18px 20px; }
+  .nav-logo-img { height:27px; }
+  .logo { font-size:.8rem; }
+  .hero h1 { font-size:clamp(2.6rem,11.5vw,3.5rem); }
+  .hero-eye { font-size:.52rem; }
+  .hero-actions { gap:8px; }
+  .hero-actions button { padding:0 18px;font-size:.78rem; }
+  .mood { gap:9px;padding:12px; }
+  .mood small { font-size:.51rem; }
+  .mood-arrow { display:none; }
+  .pc-body { grid-template-columns:1fr; }
+  .pc-art { height:160px;border-right:0;border-bottom:1px solid var(--border); }
+  .pc-art-img { object-position:center 45%; }
+  .pc-main { padding:23px 20px 18px; }
+  .pc-name { font-size:1.4rem; }
+  .pc-controls { gap:10px; }
+  .pc-vol { gap:2px; }
+  .pc-live { font-size:.58rem; }
+  .cat { font-size:.74rem;padding:10px 14px; }
+  .fp-cats { padding-left:20px;padding-right:20px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after { animation:none !important;transition:none !important;scroll-behavior:auto !important; }
+}
+
+
+/* Compact live player and a grouped station dial. */
+.pc-body { grid-template-columns:176px minmax(0,1fr);min-height:228px; }
+.pc-main { padding:24px 30px; }
+.pc-live { align-self:flex-start;padding:7px 11px;margin:0 34px 9px 0;border:1px solid var(--border);border-radius:999px;background:#ffffff05;font-size:.58rem;letter-spacing:.08em;line-height:1.5; }
+body[data-playback=playing] .pc-live { border-color:#83ded44d;background:#83ded410;color:#a0eee6; }
+body[data-playback=paused] .pc-live { color:#d7c8ec; }
+.pc-name { font-size:1.45rem; }
+.pc-eq { height:23px;margin:12px 0 13px; }
+.pc-controls { margin:0;gap:10px; }
+.pc-play,.fp-play { flex-shrink:0;width:68px;height:68px;background:#83ded4;color:#091613;box-shadow:0 0 28px #83ded41a; }
+.pc-play svg,.fp-play svg { width:29px;height:29px;fill:currentColor; }
+.pc-play:hover,.fp-play:hover { background:#a0eee6;box-shadow:0 0 32px #83ded42b; }
+.pc-art { border-color:var(--border); }
+.cats,.fp-cats { display:flex;flex-direction:column;gap:0; }
+.category-group { display:grid;grid-template-columns:98px minmax(0,1fr);align-items:start;gap:16px;padding:16px 0;border-top:1px solid var(--border); }
+.category-group:first-child { border-top:0;padding-top:0; }
+.category-heading { padding-top:14px;color:var(--muted);font:400 .64rem var(--fm); }
+.category-options { display:flex;flex-wrap:wrap;gap:9px; }
+.cat,.fp-cat { display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:0;padding:11px 17px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:#d0cada;font:500 .77rem var(--fd);line-height:1.35;white-space:nowrap; }
+.cat.active,.fp-cat.active { background:#b091df12;border-color:#b091df;color:#e8d9fc;box-shadow:none; }
+.cat.is-playing,.fp-cat.is-playing { background:#83ded414;border-color:#83ded4;color:#b1f0e7; }
+.cat-indicator { width:12px;height:14px;display:flex;align-items:center;justify-content:center;gap:2px;flex-shrink:0; }
+.cat-indicator i { display:block;width:3px;height:3px;border-radius:2px;background:currentColor;opacity:.45; }
+.cat-indicator i:not(:first-child) { display:none; }
+.is-playing .cat-indicator i { display:block;opacity:1;height:10px;animation:station-level .85s ease-in-out infinite alternate; }
+.is-playing .cat-indicator i:nth-child(2) { animation-delay:-.35s;height:14px; }
+.is-playing .cat-indicator i:nth-child(3) { animation-delay:-.6s;height:7px; }
+.cat-live { display:none;font:400 .52rem var(--fm);margin-left:3px; }
+.is-playing .cat-live { display:inline; }
+@keyframes station-level { from { transform:scaleY(.4); } to { transform:scaleY(1); } }
+.fp-cats { padding-bottom:18px; }
+.fp-cats .category-group { grid-template-columns:65px minmax(0,1fr);gap:10px;padding-block:12px; }
+.fp-cats .category-heading { font-size:.56rem; }
+.fp-cat { font-size:.67rem;padding:10px 12px; }
+@media(max-width:800px) {
+  .pc-body { grid-template-columns:148px minmax(0,1fr); }
+  .pc-main { padding:23px 20px; }
+  .pc-name { font-size:1.25rem; }
+  .category-group { grid-template-columns:76px minmax(0,1fr);gap:12px; }
+}
+@media(max-width:500px) {
+  .pc-body { display:grid;grid-template-columns:76px minmax(0,1fr);gap:15px;padding:19px;min-height:0;align-items:center; }
+  .pc-art { height:82px;width:76px;border:1px solid var(--border);border-radius:12px;grid-column:1;grid-row:1; }
+  .pc-art-img { object-position:center; }
+  .pc-main { display:contents; }
+  .pc-top { grid-column:2;min-width:0; }
+  .pc-live { padding:4px 7px;font-size:.47rem;letter-spacing:.04em;margin-right:18px;margin-bottom:2px; }
+  .pc-name { font-size:1.02rem;line-height:1.2;padding-right:5px;overflow-wrap:anywhere; }
+  .pc-meta { font-size:.55rem;line-height:1.55; }
+  .pc-eq { grid-column:1 / -1;height:18px;margin:0; }
+  .pc-main > div:last-child { grid-column:1 / -1; }
+  .pc-controls { flex-wrap:wrap;gap:4px; }
+  .pc-play { width:64px;height:64px; }
+  .pc-vol { gap:0; }
+  .pc-vol input { width:66px; }
+  .pc-expand-btn { top:8px;right:8px;min-width:30px;min-height:30px;padding:5px;border-radius:8px; }
+  .pc-expand-btn svg { width:13px;height:13px; }
+  .category-group { grid-template-columns:1fr;gap:10px;padding:17px 0; }
+  .category-heading { padding-top:0;font-size:.63rem; }
+  .category-options { gap:8px; }
+  .cat { padding:10px 13px;font-size:.75rem; }
+  .fp-cats .category-group { grid-template-columns:1fr;gap:8px; }
+  .fp-cats .category-heading { padding-top:0; }
+}
+@media(max-width:360px) {
+  .pc-vol { width:100%;justify-content:flex-end; }
+  .pc-vol input { width:90px; }
+  .pc-controls { justify-content:center; }
+  .pc-live { margin-right:12px; }
+}
+
+
+/* Rounded, centered spectrum: motion comes from the station audio. */
+.pc-eq,.fp-eq { position:relative;align-items:center;gap:3px;height:60px;margin:12px 0 15px;isolation:isolate;overflow:hidden;mask-image:linear-gradient(90deg,transparent,black 8%,black 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,black 8%,black 92%,transparent); }
+.pc-eq::before,.fp-eq::before { content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:linear-gradient(90deg,transparent,#b091df33,#83ded433,transparent);z-index:-1; }
+.eq-b { border-radius:999px;min-height:3px;transition:height .12s ease-out,opacity .25s ease;box-shadow:none; }
+.eq-b::after { display:none; }
+body[data-playback=playing] .pc-eq,body[data-playback=playing] .fp-eq { filter:drop-shadow(0 0 7px #83ded42b); }
+.fp-eq { height:48px;margin:12px 32px 0; }
+@media(max-width:500px) {
+  .pc-eq { grid-column:1 / -1;height:52px;gap:2px;margin:0; }
+}
+@media(prefers-reduced-motion:reduce) { .eq-b { transition:none; } }
+
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to radio</a>
 
 <div class="nebula">
   <div class="norb n1"></div><div class="norb n2"></div><div class="norb n3"></div>
@@ -574,20 +773,32 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
 
   </nav>
 
+  <main id="main">
   <!-- HERO -->
   <section class="hero">
-    
+    <p class="hero-eye">Tune in. Settle in. Stay a while.</p>
     <h1>Sound <em>for</em><br>every Mood</h1>
-    <p class="hero-sub">One place for every mood. From early morning chill to late-night energy — just pick a vibe and let it play.</p>
+    <p class="hero-sub">From slow mornings to late-night energy.<br>Find your frequency. We’ll take it from here.</p>
+    <div class="hero-actions">
+      <button class="listen-button" id="startListening"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Start listening</span></button>
+      <button class="surprise-button" id="surpriseMe">Surprise me <span aria-hidden="true">↗</span></button>
+    </div>
+    <div class="mood-section">
+      <p class="mood-label">What’s your mood?</p>
+      <div class="moods" aria-label="Choose a mood">
+        <button class="mood" data-station="6"><span class="mood-icon" aria-hidden="true">◎</span><span>Focus<small>Space to think</small></span><span class="mood-arrow" aria-hidden="true">↗</span></button>
+        <button class="mood" data-station="7"><span class="mood-icon" aria-hidden="true">≈</span><span>Unwind<small>Take it slow</small></span><span class="mood-arrow" aria-hidden="true">↗</span></button>
+        <button class="mood" data-station="8"><span class="mood-icon" aria-hidden="true">ϟ</span><span>Energy<small>Turn it up</small></span><span class="mood-arrow" aria-hidden="true">↗</span></button>
+        <button class="mood" data-station="2"><span class="mood-icon" aria-hidden="true">◷</span><span>Nostalgia<small>Back to the good days</small></span><span class="mood-arrow" aria-hidden="true">↗</span></button>
+      </div>
+    </div>
   </section>
 
   <!-- RADIO SECTION -->
   <div class="content" id="radio">
-    <p class="slabel">Explore Categories</p>
-    <div class="cats" id="cats"></div>
 
     <!-- BIG PLAYER CARD -->
-    <div class="player-card hidden" id="playerCard">
+    <div class="player-card" id="playerCard" aria-label="Radio player">
       <!-- Expand button -->
       <button class="pc-expand-btn" id="btnExpand" title="Open full player">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
@@ -606,46 +817,44 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
         <!-- Main -->
         <div class="pc-main">
           <div class="pc-top">
-            <div class="pc-live"><span class="dot-live"></span> Now Playing</div>
+            <div class="pc-live"><span class="dot-live"></span><span class="playback-status" role="status">Ready when you are</span></div>
             <div class="pc-name" id="pcName">—</div>
             <div class="pc-meta" id="pcMeta">—</div>
           </div>
 
-          <div class="pc-eq" id="eqVis"></div>
+          <div class="pc-eq" id="eqVis" aria-hidden="true"></div>
 
           <div>
             <div class="pc-controls">
-              <button class="pc-btn" id="btnPrev">
+              <button class="pc-btn" id="btnPrev" aria-label="Previous station">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
               </button>
-              <button class="pc-play" id="btnPlay">
+              <button class="pc-play" id="btnPlay" aria-label="Play">
                 <svg id="iPlay" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
                 <svg id="iPause" width="24" height="24" viewBox="0 0 24 24" fill="white" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
               </button>
-              <button class="pc-btn" id="btnNext">
+              <button class="pc-btn" id="btnNext" aria-label="Next station">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
               </button>
               <div class="pc-vol" style="margin-left:auto;">
                 <button id="muteBtn" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;color:var(--muted);transition:color .2s;" title="Mute/Unmute"><svg id="muteIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path id="mutePath" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
-                <input type="range" id="vol" min="0" max="1" step="0.01" value="0.8">
+                <input type="range" id="vol" aria-label="Volume" min="0" max="1" step="0.01" value="0.8">
               </div>
             </div>
 
-            <div class="pc-prog">
-              <span class="pc-time" id="tNow">0:00</span>
-              <div class="pc-bar" id="pcBar"><div class="pc-fill" id="pcFill" style="width:0%"></div></div>
-              <span class="pc-time" id="tTot">Live</span>
-            </div>
           </div>
         </div>
 
       </div>
     </div>
+    <p class="slabel">Explore the dial <span class="station-count">11 stations</span></p>
+    <div class="cats" id="cats"></div>
   </div>
 
+  </main>
   <!-- FULL PLAYER MODAL -->
-  <div class="fp-overlay" id="fpOverlay">
-    <div class="fp-modal" id="fpModal">
+  <div class="fp-overlay" id="fpOverlay" inert>
+    <div class="fp-modal" id="fpModal" role="dialog" aria-modal="true" aria-labelledby="fpName">
       <button class="fp-close" id="fpClose" title="Close">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
       </button>
@@ -661,24 +870,24 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
 
       <!-- Info -->
       <div class="fp-info">
-        <div class="fp-live"><span class="dot-live"></span> Now Playing</div>
+        <div class="fp-live"><span class="dot-live"></span><span class="playback-status">Ready when you are</span></div>
         <div class="fp-name" id="fpName">—</div>
         <div class="fp-meta" id="fpMeta">—</div>
       </div>
 
       <!-- EQ -->
-      <div class="fp-eq" id="fpEq"></div>
+      <div class="fp-eq" id="fpEq" aria-hidden="true"></div>
 
       <!-- Controls -->
       <div class="fp-controls">
-        <button class="fp-btn" id="fpPrev">
+        <button class="fp-btn" id="fpPrev" aria-label="Previous station">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
         </button>
-        <button class="fp-play" id="fpPlay">
+        <button class="fp-play" id="fpPlay" aria-label="Play">
           <svg id="fpIPlay" width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
           <svg id="fpIPause" width="28" height="28" viewBox="0 0 24 24" fill="white" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
-        <button class="fp-btn" id="fpNext">
+        <button class="fp-btn" id="fpNext" aria-label="Next station">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
         </button>
       </div>
@@ -686,7 +895,7 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
       <!-- Volume -->
       <div class="fp-vol">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-        <input type="range" id="fpVol" min="0" max="1" step="0.01" value="0.8">
+        <input type="range" id="fpVol" aria-label="Volume" min="0" max="1" step="0.01" value="0.8">
       </div>
 
       <!-- Categories -->
@@ -697,7 +906,7 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
 
   <footer>
     <span class="logo-sm">NIMBUS RADIO</span>
-    <span>© 2026 Nimbus Radio. All rights reserved · v3.0</span>
+    <span>© 2026 Nimbus Radio. All rights reserved · v3.1</span>
   </footer>
 
   <!-- FEEDBACK BUTTON -->
@@ -707,7 +916,7 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
   </button>
 </div>
 
-<audio id="audio" crossorigin="anonymous"></audio>
+<audio id="audio" preload="none" crossorigin="anonymous"></audio>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -797,61 +1006,112 @@ function initCtx() {
   actx = new (window.AudioContext||window.webkitAudioContext)();
   analyser = actx.createAnalyser();
   analyser.fftSize = 128;
+  analyser.smoothingTimeConstant = 0.82;
   dataArr = new Uint8Array(analyser.frequencyBinCount);
   asrc = actx.createMediaElementSource(audio);
   asrc.connect(analyser); analyser.connect(actx.destination);
 }
 
-// EQ animation
-let idleT = 0;
-(function animEQ() {
-  if (analyser && isPlaying) {
-    analyser.getByteFrequencyData(dataArr);
-    eqBars.forEach((b,i) => {
-      const v = dataArr[i] || 0;
-      b.style.height = Math.max(2,(v/255)*60)+'px';
-      b.style.opacity = .25+(v/255)*.75;
-    });
-  } else {
-    idleT += .03;
-    eqBars.forEach((b,i) => {
-      const h = Math.max(2, 5+Math.sin(idleT+i*.35)*9+Math.sin(idleT*1.5+i*.2)*5);
-      b.style.height = h+'px'; b.style.opacity=.16;
-    });
-  }
-  // nav eq mirrors main eq but smaller
-  if (analyser && isPlaying) {
-    navBars.forEach((b,i) => {
-      const v = dataArr[i*2] || 0;
-      b.style.height = Math.max(2,(v/255)*20)+'px';
-      b.style.opacity = .3+(v/255)*.7;
-    });
-  } else {
-    navBars.forEach((b,i) => {
-      const h = Math.max(2,3+Math.sin(idleT+i*.5)*5+Math.sin(idleT*1.4+i*.25)*3);
-      b.style.height = h+'px'; b.style.opacity=.2;
-    });
-  }
-  requestAnimationFrame(animEQ);
-})();
-
-// render cats
-  const catWrap = document.getElementById('cats');
-  if (catWrap) CATS.forEach(cat => {
-    const btn = document.createElement('button');
-    btn.className = 'cat';
-    btn.innerHTML = `<span class="cat-dot">◆</span>${cat.label}`;
-    btn.dataset.label = cat.label;
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.cat').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const s = STATIONS.find(x => x.genre === cat.label);
-      if (s) loadStation(s);
-    });
-    catWrap.appendChild(btn);
+// One audio-driven waveform for both player views. Idle is deliberately still.
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let waveFrame = null;
+function paintWave() {
+  waveFrame = null;
+  const live = analyser && isPlaying && document.body.dataset.playback === 'playing' && !reducedMotion.matches;
+  if (live) analyser.getByteFrequencyData(dataArr);
+  eqBars.forEach((bar, i) => {
+    const position = i / (eqBars.length - 1);
+    const envelope = Math.pow(Math.sin(position * Math.PI), .75);
+    const level = live ? dataArr[i] / 255 : 0;
+    const resting = 4 + 19 * envelope * (.3 + .7 * Math.abs(Math.sin(i * .61)));
+    bar.style.height = (live ? 4 + level * 48 * (.25 + envelope * .75) : resting) + 'px';
+    bar.style.opacity = live ? .5 + level * .5 : .38;
+    bar.style.background = `hsl(${268 - position * 101} 64% 76%)`;
   });
+  const expanded = document.getElementById('fpOverlay').classList.contains('open');
+  if (expanded) document.querySelectorAll('#fpEq .eq-b').forEach((bar, i, bars) => {
+    const source = eqBars[Math.round(i / (bars.length - 1) * (eqBars.length - 1))];
+    bar.style.height = parseFloat(source.style.height) * .8 + 'px';
+    bar.style.opacity = source.style.opacity;
+    bar.style.background = source.style.background;
+  });
+  navBars.forEach((bar, i) => {
+    const source = eqBars[Math.min(i * 2, eqBars.length - 1)];
+    bar.style.height = parseFloat(source.style.height) * .4 + 'px';
+  });
+  if (live && !document.hidden) waveFrame = requestAnimationFrame(paintWave);
+}
+function refreshWave() {
+  if (waveFrame !== null) cancelAnimationFrame(waveFrame);
+  paintWave();
+}
+reducedMotion.addEventListener('change', refreshWave);
+document.addEventListener('visibilitychange', refreshWave);
 
-function loadStation(s) {
+// Keep the same station order in the dial and expanded player.
+const CATEGORY_GROUPS = [
+  {name:'Decades', categories:CATS.slice(0,4)},
+  {name:'Music', categories:CATS.slice(4,9)},
+  {name:'News', categories:CATS.slice(9)}
+];
+const SHORT_LABELS = {
+  '70s Music':'70s', '80s Music':'80s', '90s Music':'90s', '00s Music':'00s',
+  "Today's Top Hits":'Hits', 'Classical & Instrumental':'Classical',
+  'Relax Music':'Relax', 'Electronic Music':'Electronic',
+  'Música en Español':'Español', 'Noticias ES':'Español', 'News':'English'
+};
+function renderCategories(container, expanded = false) {
+  CATEGORY_GROUPS.forEach((group, index) => {
+    const section = document.createElement('section');
+    section.className = 'category-group';
+    const heading = document.createElement('h3');
+    heading.id = `${expanded ? 'full' : 'dial'}-group-${index}`;
+    heading.className = 'category-heading';
+    heading.textContent = group.name;
+    section.setAttribute('aria-labelledby', heading.id);
+    section.appendChild(heading);
+    const list = document.createElement('div');
+    list.className = 'category-options';
+    group.categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = expanded ? 'fp-cat' : 'cat';
+      btn.dataset.label = cat.label;
+      btn.setAttribute('aria-pressed','false');
+      btn.setAttribute('aria-label', cat.label);
+      btn.innerHTML = `<span class="cat-indicator" aria-hidden="true"><i></i><i></i><i></i></span><span>${SHORT_LABELS[cat.label]}</span><span class="cat-live" aria-hidden="true">Live</span>`;
+      btn.addEventListener('click', () => {
+        const station = STATIONS.find(cat.fn);
+        if (station) loadStation(station);
+      });
+      list.appendChild(btn);
+    });
+    section.appendChild(list);
+    container.appendChild(section);
+  });
+}
+renderCategories(document.getElementById('cats'));
+function syncCategoryPlayback() {
+  const station = STATIONS.find(s => s.id === currentId);
+  const live = isPlaying && document.body.dataset.playback === 'playing';
+  document.querySelectorAll('.cat, .fp-cat').forEach(btn => {
+    const playing = live && btn.dataset.label === station?.genre;
+    btn.classList.toggle('is-playing', playing);
+    btn.setAttribute('aria-label', btn.dataset.label + (playing ? ', playing live' : ''));
+  });
+}
+
+function loadStation(s, autoplay = true) {
+  ++playRequest;
+  clearTimeout(connectionTimer);
+  audio.pause();
+  isPlaying = false;
+  syncPlayIcons();
+  document.querySelectorAll(".cat").forEach(b => {
+    const selected = b.dataset.label === s.genre;
+    b.classList.toggle("active", selected);
+    b.setAttribute("aria-pressed", selected);
+  });
+  document.querySelectorAll(".mood").forEach(b => b.setAttribute("aria-pressed", Number(b.dataset.station) === s.id));
   currentId = s.id;
   // show card
   const card = document.getElementById('playerCard');
@@ -871,44 +1131,70 @@ function loadStation(s) {
   }
   document.getElementById('pcName').textContent = s.name;
   if(typeof updateMediaSession==='function') updateMediaSession(s.name);
-  document.getElementById('pcMeta').textContent = `${s.country} · ${s.genre} · 128 kbps`;
+  document.getElementById('pcMeta').textContent = `${s.genre} · Live radio`;
   // load & play
   audio.src = s.stream;
-  doPlay();
+  if (autoplay) doPlay();
+  else { setPlaybackStatus("Ready when you are"); syncPlayIcons(); }
   // sync modal if open
   if (typeof syncModalFn === 'function') syncModalFn(s);
   // scroll to player
-  setTimeout(() => card.scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
+  // Keep the listener’s position when switching stations.
 }
 
+let playRequest = 0;
+let connectionTimer;
+function setPlaybackStatus(text, state = 'ready') {
+  document.querySelectorAll('.playback-status').forEach(el => el.textContent = text);
+  document.body.dataset.playback = state;
+  syncCategoryPlayback();
+  refreshWave();
+}
+function playbackFailed() {
+  clearTimeout(connectionTimer);
+  isPlaying = false;
+  setPlaybackStatus('Can’t connect. Press play to retry.', 'error');
+  syncPlayIcons();
+}
 function doPlay() {
-  initCtx();
-  if (actx && actx.state === 'suspended') actx.resume();
-  const playPromise = audio.play();
-  if (playPromise) {
-    playPromise.then(() => {
-      isPlaying = true;
-      if (actx && actx.state === 'suspended') actx.resume();
-      syncPlayIcons();
-    }).catch(()=>{});
-  } else {
-    isPlaying = true;
-    syncPlayIcons();
-  }
-  document.getElementById('iPlay').style.display = 'none';
-  document.getElementById('iPause').style.display = '';
+  if (currentId === null) return;
+  const request = ++playRequest;
+  clearTimeout(connectionTimer);
+  setPlaybackStatus('Connecting…', 'loading');
+  try {
+    initCtx();
+    if (actx && actx.state === 'suspended') actx.resume().catch(() => {});
+    if (audio.error) audio.load();
+    const promise = audio.play();
+    if (promise) promise.catch(error => {
+      if (request !== playRequest || error.name === 'AbortError') return;
+      playbackFailed();
+    });
+    connectionTimer = setTimeout(() => {
+      if (request === playRequest && !isPlaying) {
+        ++playRequest;
+        audio.pause();
+        playbackFailed();
+      }
+    }, 15000);
+  } catch (error) { playbackFailed(); }
 }
 function doPause() {
-  audio.pause(); isPlaying = false;
-  document.getElementById('iPlay').style.display = '';
-  document.getElementById('iPause').style.display = 'none';
+  ++playRequest;
+  clearTimeout(connectionTimer);
+  audio.pause();
+  isPlaying = false;
+  setPlaybackStatus('Paused', 'paused');
   syncPlayIcons();
 }
 function syncPlayIcons() {
-  const fpIPlay  = document.getElementById('fpIPlay');
-  const fpIPause = document.getElementById('fpIPause');
-  if (fpIPlay)  fpIPlay.style.display  = isPlaying ? 'none' : '';
-  if (fpIPause) fpIPause.style.display = isPlaying ? '' : 'none';
+  syncCategoryPlayback();
+  refreshWave();
+  ['iPlay', 'fpIPlay'].forEach(id => document.getElementById(id).style.display = isPlaying ? 'none' : '');
+  ['iPause', 'fpIPause'].forEach(id => document.getElementById(id).style.display = isPlaying ? '' : 'none');
+  ['btnPlay', 'fpPlay'].forEach(id => document.getElementById(id).setAttribute('aria-label', isPlaying ? 'Pause' : 'Play'));
+  document.querySelector('#startListening span').textContent = isPlaying ? 'Pause radio' : 'Start listening';
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
 }
 
 document.getElementById('btnPlay').onclick = () => { isPlaying ? doPause() : doPlay(); };
@@ -931,25 +1217,20 @@ document.getElementById('btnPrev').onclick = () => {
   loadStation(prev);
 };
 
-// ensure isPlaying syncs with actual audio state (critical for mobile)
+// Playback state follows the media element, including mobile interruptions.
 audio.addEventListener('playing', () => {
+  clearTimeout(connectionTimer);
   isPlaying = true;
-  if (actx && actx.state === 'suspended') actx.resume();
+  setPlaybackStatus('Live now', 'playing');
+  syncPlayIcons();
 });
-audio.addEventListener('pause', () => { isPlaying = false; });
-audio.addEventListener('waiting', () => { /* buffering - keep isPlaying true */ });
-
-// iOS/Android AudioContext unlock on first touch
-document.addEventListener('touchstart', function unlockAudio() {
-  if (actx && actx.state === 'suspended') actx.resume();
-  if (!actx) {
-    // pre-init on touch so it's ready when play is hit
-    try {
-      actx = new (window.AudioContext||window.webkitAudioContext)();
-    } catch(e) {}
-  }
-  document.removeEventListener('touchstart', unlockAudio);
-}, { once: true });
+audio.addEventListener('pause', () => {
+  isPlaying = false;
+  if (document.body.dataset.playback === 'playing') setPlaybackStatus('Paused', 'paused');
+  syncPlayIcons();
+});
+audio.addEventListener('waiting', () => setPlaybackStatus('Buffering…', 'loading'));
+audio.addEventListener('error', playbackFailed);
 
 audio.addEventListener('ended', () => {
   const i = STATIONS.findIndex(s => s.id === currentId);
@@ -960,34 +1241,11 @@ audio.addEventListener('ended', () => {
   loadStation(next);
 });
 
-// progress
-audio.addEventListener('timeupdate', () => {
-  if (!audio.duration || isNaN(audio.duration) || !isFinite(audio.duration)) {
-    document.getElementById('tNow').textContent = fmt(audio.currentTime);
-    document.getElementById('tTot').textContent = 'Live';
-    document.getElementById('pcFill').style.width = '0%';
-    return;
-  }
-  const pct = (audio.currentTime/audio.duration)*100;
-  document.getElementById('pcFill').style.width = pct+'%';
-  document.getElementById('tNow').textContent = fmt(audio.currentTime);
-  document.getElementById('tTot').textContent = fmt(audio.duration);
-});
-document.getElementById('pcBar').onclick = e => {
-  if (!audio.duration || isNaN(audio.duration)) return;
-  const r = e.currentTarget.getBoundingClientRect();
-  audio.currentTime = ((e.clientX-r.left)/r.width)*audio.duration;
-};
-
 // volume
 const vol = document.getElementById('vol');
 audio.volume = vol.value;
-vol.oninput = () => { audio.volume = vol.value; };
+vol.oninput = () => { audio.volume = vol.value; document.getElementById('fpVol').value = vol.value; };
 
-function fmt(s) {
-  if (isNaN(s)) return '0:00';
-  return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
-}
 // ── FEEDBACK ──
 const FORMSPREE_ID = 'mrelklpw';
 // feedback
@@ -1000,8 +1258,9 @@ const FORMSPREE_ID = 'mrelklpw';
   const fbSubmit  = document.getElementById('fbSubmit');
   const fbSuccess = document.getElementById('fbSuccess');
   if (!fbTrigger) return;
-  function openFb()  { fbOverlay.classList.add('active'); fbPanel.classList.add('active'); fbText.focus(); }
+  function openFb()  { fbPanel.inert = false; fbOverlay.classList.add('active'); fbPanel.classList.add('active'); fbText.focus(); }
   function closeFb() {
+    fbPanel.inert = true; fbTrigger.focus();
     fbOverlay.classList.remove('active'); fbPanel.classList.remove('active');
     setTimeout(() => { fbSuccess.classList.remove('visible'); fbText.value=''; fbChar.textContent='0/200';
       fbSubmit.textContent='Send suggestion'; fbSubmit.disabled=false; }, 400);
@@ -1037,7 +1296,7 @@ function updateMediaSession(name) {
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: name, artist: 'Nimbus Radio', album: 'Live Stream',
-      artwork: [{ src: '/favicon.png', sizes: '512x512', type: 'image/png' }]
+      artwork: [{ src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' }]
     });
     navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
   }
@@ -1092,32 +1351,7 @@ if (muteBtn) {
     b.style.height = '4px';
     fpEqEl.appendChild(b);
   }
-  const fpBars = fpEqEl.querySelectorAll('.eq-b');
-  let fpEqActive = false;
-  function fpAnimEq() {
-    if (!fpEqActive) return;
-    fpBars.forEach(b => {
-      b.style.height = (isPlaying ? (6 + Math.random() * 38) : 4) + 'px';
-    });
-    requestAnimationFrame(fpAnimEq);
-  }
-
-  // Build category buttons
-  CATS.forEach((cat, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'fp-cat';
-    btn.textContent = cat.label;
-    btn.addEventListener('click', () => {
-      const s = STATIONS.find(x => cat.fn(x));
-      if (!s) return;
-      // update main cat buttons too
-      document.querySelectorAll('.cat').forEach(b => {
-        b.classList.toggle('active', b.dataset.label === s.genre);
-      });
-      loadStation(s);
-    });
-    fpCatsEl.appendChild(btn);
-  });
+  renderCategories(fpCatsEl, true);
 
   // syncModalFn — called by loadStation on every station change
   window.syncModalFn = function(s) {
@@ -1130,7 +1364,7 @@ if (muteBtn) {
       s = STATIONS.find(x => x.id === currentId);
     } else {
       fpName.textContent = s.name;
-      fpMeta.textContent = `${s.country} · ${s.genre} · 128 kbps`;
+      fpMeta.textContent = `${s.genre} · Live radio`;
     }
 
     // art
@@ -1154,21 +1388,29 @@ if (muteBtn) {
     // highlight active category
     const catBtns = fpCatsEl.querySelectorAll('.fp-cat');
     catBtns.forEach((btn, i) => {
-      btn.classList.toggle('active', s && CATS[i] && CATS[i].fn(s));
+      const selected = Boolean(s && CATS[i] && CATS[i].fn(s));
+      btn.classList.toggle('active', selected);
+      btn.setAttribute('aria-pressed', selected);
     });
   };
 
   function openModal() {
     window.syncModalFn(null);
+    overlay.inert = false;
     overlay.classList.add('open');
+    document.getElementById('main').inert = true;
+    fpClose.focus();
     document.body.style.overflow = 'hidden';
-    fpEqActive = true;
-    fpAnimEq();
+    refreshWave();
   }
   function closeModal() {
+    if (!overlay.classList.contains('open')) return;
+    overlay.inert = true;
     overlay.classList.remove('open');
+    document.getElementById('main').inert = false;
+    btnExpand.focus();
     document.body.style.overflow = '';
-    fpEqActive = false;
+    refreshWave();
   }
 
   btnExpand.addEventListener('click', openModal);
@@ -1208,6 +1450,27 @@ if (muteBtn) {
 })();
 
 
+document.getElementById('startListening').addEventListener('click', () => isPlaying ? doPause() : doPlay());
+document.getElementById('surpriseMe').addEventListener('click', () => {
+  const music = STATIONS.filter(s => s.id <= 9 && s.id !== currentId);
+  loadStation(music[Math.floor(Math.random() * music.length)]);
+});
+document.querySelectorAll('.mood').forEach(btn => btn.addEventListener('click', () => {
+  loadStation(STATIONS.find(s => s.id === Number(btn.dataset.station)));
+}));
+// Keep keyboard focus inside either open dialog.
+document.addEventListener('keydown', event => {
+  const panel = document.querySelector('.fp-overlay.open .fp-modal, .fb-panel.active');
+  if (!panel) return;
+  if (event.key === 'Escape' && panel.id === 'fbPanel') closeFb();
+  if (event.key !== 'Tab') return;
+  const controls = Array.from(panel.querySelectorAll('button:not(:disabled), input, textarea, a[href]'));
+  const first = controls[0], last = controls[controls.length - 1];
+  if (event.shiftKey && (document.activeElement === first || !panel.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
+  else if (!event.shiftKey && (document.activeElement === last || !panel.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
+});
+const shortcutStations = { '#70s': 1, '#electronic': 8 };
+loadStation(STATIONS.find(s => s.id === (shortcutStations[location.hash] || 7)), false);
 });
 
 </script>
@@ -1216,15 +1479,15 @@ if (muteBtn) {
 <div class="fb-overlay" id="fbOverlay"></div>
 
 <!-- FEEDBACK PANEL -->
-<div class="fb-panel" id="fbPanel">
+<div class="fb-panel" id="fbPanel" inert role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
   <div class="fb-header">
-    <h3>Help shape Nimbus Radio</h3>
-    <button class="fb-close" id="fbClose">&times;</button>
+    <h3 id="feedbackTitle">Help shape Nimbus Radio</h3>
+    <button class="fb-close" id="fbClose" aria-label="Close feedback">&times;</button>
   </div>
-  <textarea id="fbText" placeholder="What's on your mind? We'd love to hear it..." maxlength="200"></textarea>
+  <textarea aria-label="Your suggestion" id="fbText" placeholder="What's on your mind? We'd love to hear it..." maxlength="200"></textarea>
   <div class="fb-char" id="fbChar">0/200</div>
   <button class="fb-submit" id="fbSubmit">Send suggestion</button>
-  <div class="fb-success" id="fbSuccess">
+  <div class="fb-success" id="fbSuccess" role="status">
     <svg viewBox="0 0 24 24" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     <p>Thanks! We're listening.</p>
   </div>

@@ -2,12 +2,15 @@
   "name": "Nimbus Radio",
   "short_name": "Nimbus Radio",
   "description": "Curated internet radio — every mood, every vibe.",
-  "start_url": "/nimbus-radio.html",
+  "start_url": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#06060a",
   "theme_color": "#06060a",
-  "categories": ["music", "entertainment"],
+  "categories": [
+    "music",
+    "entertainment"
+  ],
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -26,13 +29,14 @@
   "shortcuts": [
     {
       "name": "70s Music",
-      "url": "/nimbus-radio.html#70s",
+      "url": "./#70s",
       "description": "Play 70s Music"
     },
     {
       "name": "Electronic Music",
-      "url": "/nimbus-radio.html#electronic",
+      "url": "./#electronic",
       "description": "Play Electronic Music"
     }
-  ]
+  ],
+  "scope": "./"
 }

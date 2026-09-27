@@ -1,96 +1,57 @@
-/* ============================================
-   Nimbus Radio — Service Worker v1.0
-   ============================================ */
-
-const CACHE_NAME = 'nimbus-radio-v1';
-
-// Files to cache immediately on install (app shell)
+/* Nimbus Radio — app shell v3.1 */
+const CACHE_PREFIX = 'nimbus-radio-';
+const CACHE_NAME = `${CACHE_PREFIX}v3.1`;
 const SHELL = [
-  '/nimbus-radio.html',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/apple-touch-icon.png',
-  '/favicon-32.png'
-];
+  './', './index.html', './manifest.json',
+  './icons/icon-192.png', './icons/icon-512.png',
+  './apple-touch-icon.png', './favicon-32.png'
+].map(path => new URL(path, self.registration.scope).href);
+const HOME = new URL('./index.html', self.registration.scope).href;
 
-// ── Install: cache the app shell ──────────────
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL))
-  );
-  // NO skipWaiting aquí — esperamos que el usuario confirme
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL)));
+  // Existing listeners choose when to activate through the update banner.
 });
 
-// ── El usuario tocó "Actualizar" en el banner ──
 self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// ── Activate: clean up old caches ─────────────
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      )
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+      .map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
 
-// ── Fetch strategy ────────────────────────────
 self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-
-  // Never intercept audio streams
-  const isAudioStream =
-    event.request.destination === 'audio' ||
-    url.pathname.endsWith('.mp3') ||
-    url.pathname.endsWith('.aac') ||
-    url.pathname.includes('stream') ||
-    url.hostname.includes('streamtheworld') ||
-    url.hostname.includes('cdnstream') ||
-    url.hostname.includes('infomaniak') ||
-    url.hostname.includes('streamguys') ||
-    url.hostname.includes('musicradio') ||
-    url.hostname.includes('181fm') ||
-    url.hostname.includes('pureplay') ||
-    url.hostname.includes('rfienespagnol') ||
-    url.hostname.includes('npr-ice');
-
-  if (isAudioStream) return;
-
-  // App shell → cache-first
-  const isShell = SHELL.some(path => url.pathname.endsWith(path.replace(/^\//, '')));
-  if (isShell) {
-    event.respondWith(
-      caches.match(event.request).then(cached => {
-        if (cached) return cached;
-        return fetch(event.request).then(response => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return response;
-        });
-      })
-    );
-    return;
-  }
-
-  // Everything else → network-first, cache fallback
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        if (event.request.method === 'GET' && response.status === 200) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      })
-      .catch(() => caches.match(event.request))
+  const request = event.request;
+  const url = new URL(request.url);
+  // Audio, remote streams, external fonts and feedback bypass this cache.
+  if (request.method !== 'GET' || url.origin !== self.location.origin || request.destination === 'audio') return;
+  const navigation = request.mode === 'navigate';
+  const legacyEntry = new URL('./nimbus-radio.html', self.registration.scope).pathname;
+  const appEntry = navigation && (
+    url.pathname === new URL(self.registration.scope).pathname ||
+    url.pathname === new URL(HOME).pathname || url.pathname === legacyEntry
   );
+  if (!appEntry && !SHELL.includes(url.href)) return;
+
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const target = appEntry ? HOME : request;
+    try {
+      const response = await fetch(target, { cache: 'no-cache' });
+      if (response.ok) await cache.put(target, response.clone());
+      // Prefer the last working shell to a temporary host error.
+      if (!response.ok) return (await cache.match(target)) || response;
+      return response;
+    } catch (error) {
+      const cached = await cache.match(target);
+      if (cached) return cached;
+      throw error;
+    }
+  })());
 });
