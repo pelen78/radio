@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#06060a">
+<title>Recuperar Nimbus Radio</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;background:#06060a;color:#e8e4f0;font-family:system-ui,sans-serif;padding:24px}main{max-width:460px;border:1px solid #b091df44;border-radius:24px;background:#11111c;padding:32px}small{color:#83ded4;letter-spacing:.14em}h1{font-size:30px;line-height:1.1;margin:24px 0 16px}p{color:#bab4c9;line-height:1.65}button,a{font:600 16px system-ui;display:inline-block;margin-top:12px;background:#83ded4;color:#091613;border:0;border-radius:999px;padding:15px 22px;cursor:pointer;text-decoration:none}button:focus-visible,a:focus-visible{outline:2px solid #b091df;outline-offset:5px}button:disabled{opacity:.6;cursor:wait}[hidden]{display:none}
+</style>
+</head>
+<body><main>
+<small>NIMBUS RADIO</small>
+<h1>Volvamos a la música.</h1>
+<p>Este botón retira el actualizador anterior de Nimbus de este navegador para que puedas abrir la versión corregida.</p>
+<button id="repair" type="button">Reparar y abrir la radio</button>
+<p id="status" role="status"></p>
+<a id="open" href="./" hidden>Abrir Nimbus Radio</a>
+</main>
+<script>
+const button = document.getElementById('repair');
+const status = document.getElementById('status');
+button.addEventListener('click', async () => {
+  button.disabled = true;
+  status.textContent = 'Retirando el actualizador anterior…';
+  try {
+    if ('serviceWorker' in navigator) {
+      const scope = new URL('./', location.href).href;
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      // Only Nimbus at this exact app scope; never other apps or browser data.
+      for (const registration of registrations) {
+        const worker = registration.active || registration.waiting || registration.installing;
+        if (registration.scope === scope && worker && new URL(worker.scriptURL).pathname === new URL('sw.js', scope).pathname) {
+          await registration.unregister();
+        }
+      }
+    }
+    status.textContent = 'Listo. Abriendo Nimbus Radio…';
+    document.getElementById('open').hidden = false;
+    location.replace(new URL('./', location.href).href);
+  } catch (error) {
+    status.textContent = 'No se pudo completar la reparación. Intenta de nuevo.';
+    button.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
