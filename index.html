@@ -1428,6 +1428,15 @@ function startListening() {
   revealPlayer();
 }
 
+function tuneAndReveal(station) {
+  if (station.id === currentId) {
+    startListening();
+    return;
+  }
+  loadStation(station);
+  revealPlayer();
+}
+
 document.getElementById('navListen').addEventListener('click', startListening);
 document.getElementById('heroListen').addEventListener('click', startListening);
 function initStationBanner() {
@@ -1473,8 +1482,7 @@ function initStationBanner() {
   track.addEventListener('click', event => {
     const stationButton = event.target.closest('[data-featured-station]');
     if (!stationButton) return;
-    loadStation(STATIONS.find(station => station.id === Number(stationButton.dataset.featuredStation)));
-    revealPlayer();
+    tuneAndReveal(STATIONS.find(station => station.id === Number(stationButton.dataset.featuredStation)));
   });
 }
 initStationBanner();
@@ -1751,10 +1759,10 @@ muteButton.addEventListener('click', () => {
 
 document.getElementById('surpriseMe').addEventListener('click', () => {
   const music = STATIONS.filter(s => s.id <= 9 && s.id !== currentId);
-  loadStation(music[Math.floor(Math.random() * music.length)]);
+  tuneAndReveal(music[Math.floor(Math.random() * music.length)]);
 });
 document.querySelectorAll('.mood').forEach(btn => btn.addEventListener('click', () => {
-  loadStation(STATIONS.find(s => s.id === Number(btn.dataset.station)));
+  tuneAndReveal(STATIONS.find(s => s.id === Number(btn.dataset.station)));
 }));
 // Keep keyboard focus inside either open dialog.
 document.addEventListener('keydown', event => {
