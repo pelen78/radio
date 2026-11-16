@@ -561,7 +561,6 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 .hero-player #vol::-webkit-slider-thumb { background: white; box-shadow: 0 0 0 4px #b29afa43; }
 .hero-player #vol::-moz-range-thumb { width: 17px; height: 17px; background: white; border: 0; border-radius: 50%; box-shadow: 0 0 0 4px #b29afa43; }
 
-.station-catalog { scroll-margin-top: var(--header-height); }
 .station-strip {
   --strip-gap: clamp(15px, 2.1vw, 40px);
   display: flex; align-items: center;
@@ -605,6 +604,7 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 .station-section {
   width: min(92%, 1644px); margin-inline: auto;
   padding: clamp(52px, 8.4vw, 150px) clamp(12px, 2.45vw, 44px) clamp(42px, 4vw, 70px);
+  scroll-margin-top: var(--header-height);
   background: linear-gradient(160deg, #100e1e, #0e0d1a 58%, #100e1c);
 }
 .station-heading {
@@ -700,34 +700,107 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 .station-card[data-state="loading"] .station-card-category { color: var(--aqua); }
 .station-card[data-state="error"] .station-card-category { color: #ffb5b5; }
 
-.discovery { padding-block: clamp(44px, 5vw, 90px); }
+.discovery { padding-block: clamp(54px, 6.5vw, 118px); }
 .discovery > section { scroll-margin-top: calc(var(--header-height) + 24px); }
-.discovery > section + section { margin-top: clamp(32px, 4vw, 60px); padding-top: clamp(28px, 3vw, 52px); border-top: 1px solid var(--border); }
-.discovery h2 { font: 400 clamp(34px, 4vw, 66px)/1.05 var(--display); }
-.discovery .mood-hint, .how-section p { font: 400 clamp(15px, 1.15vw, 19px)/1.55 var(--fd); }
-.mood-hint { color: var(--muted); margin: 9px 0 24px; }
-.mood-section { position: relative; }
-.mood-actions { position: absolute; top: clamp(28px, 3vw, 52px); right: 0; }
+.mood-heading {
+  display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap;
+  gap: 18px 24px; margin-bottom: clamp(27px, 3.35vw, 60px);
+}
+.mood-kicker {
+  color: var(--aqua); font: 400 clamp(10px, .75vw, 13px)/1.5 var(--fm);
+  letter-spacing: .24em; text-transform: uppercase; margin-bottom: clamp(12px, 1.35vw, 23px);
+}
+.mood-heading h2 { font: 400 clamp(46px, 4.45vw, 79px)/1 var(--display); letter-spacing: -.015em; }
+.mood-heading h2 i { color: #ada7b6; }
+.mood-hint { color: var(--muted); margin-top: clamp(12px, 1.35vw, 23px); font: 400 clamp(15px, 1.15vw, 21px)/1.55 var(--fd); }
 .surprise-button {
-  min-height: 44px; padding: 0 16px; background: transparent; color: var(--text);
-  border: 1px solid var(--border); border-radius: 999px; cursor: pointer; font: 600 15px var(--fd);
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px;
+  padding: clamp(10px, 1.1vw, 20px) clamp(16px, 1.65vw, 30px);
+  background: transparent; color: var(--text); border: 1px solid #ffffff20; border-radius: 999px;
+  cursor: pointer; font: 500 clamp(15px, 1.14vw, 20px)/1.2 var(--fd);
+  transition: border-color .2s, background-color .2s;
 }
-.surprise-button:hover { background: var(--surface2); }
-.surprise-button span { color: var(--lavender); padding-left: 6px; }
-.moods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.surprise-button:hover { background: var(--surface2); border-color: #b29afa85; }
+.surprise-button svg { color: var(--lavender); flex-shrink: 0; }
+.moods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.45vw, 26px); }
 .mood {
-  display: flex; align-items: center; gap: 12px; text-align: left; min-height: 74px; padding: 13px;
-  border-radius: 15px; background: #ffffff04; border: 1px solid var(--border); color: var(--text);
-  font: 600 17px var(--fd); cursor: pointer; transition: border-color .2s, background .2s;
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column; align-items: start; justify-content: space-between;
+  min-width: 0; aspect-ratio: .76; padding: clamp(14px, 1.4vw, 25px);
+  border-radius: clamp(19px, 1.95vw, 35px); border: 1px solid #ffffff16;
+  background: linear-gradient(to bottom, transparent 6%, #0b09131a 43%, #0a090ff5 100%), var(--mood-art);
+  color: var(--text); text-align: left; cursor: pointer;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
 }
-.mood small { display: block; font: 400 13px/1.3 var(--fd); color: var(--muted); margin-top: 3px; }
-.mood-icon { color: #c2a5e9; flex-shrink: 0; font: 400 24px var(--fm); }
-.mood:nth-child(2) .mood-icon { color: #83ded4; }
-.mood:nth-child(3) .mood-icon { color: #edbf85; }
-.mood:nth-child(4) .mood-icon { color: #e5a5bb; }
-.mood-arrow { margin-left: auto; color: var(--muted); }
-.mood:hover, .mood[aria-pressed=true] { border-color: var(--aqua); background: #63e7d50d; }
-.how-section p { color: var(--muted); max-width: 52ch; margin-top: 12px; }
+.mood:hover { border-color: var(--mood-accent); transform: translateY(-3px); }
+.mood[aria-pressed=true] { border-color: color-mix(in srgb, var(--mood-accent) 65%, transparent); box-shadow: 0 8px 30px #0003; }
+.mood::before, .mood::after { content: ''; position: absolute; z-index: -1; pointer-events: none; }
+.mood-icon {
+  display: grid; place-items: center; width: clamp(32px, 3vw, 52px); aspect-ratio: 1; border-radius: 50%;
+  background: color-mix(in srgb, var(--mood-accent) 23%, transparent);
+  color: var(--mood-accent); font: 500 clamp(19px, 1.45vw, 26px)/1 var(--fd);
+}
+.mood-copy { display: flex; flex-direction: column-reverse; gap: clamp(5px, .65vw, 11px); }
+.mood-name { font: 400 clamp(32px, 3.4vw, 61px)/1 var(--display); }
+i.mood-name { font-style: italic; }
+.mood-caption {
+  color: #c5bdce; font: 400 clamp(9px, .67vw, 12px)/1.3 var(--fm);
+  letter-spacing: .18em; text-transform: uppercase;
+}
+.mood-focus { --mood-accent: #d1c2ff; --mood-art: linear-gradient(135deg, #6365ed, #6b22c8 47%, #191022); }
+.mood-focus::before {
+  top: 17%; left: 33%; width: 56%; aspect-ratio: 1; border-radius: 50%;
+  background:
+    radial-gradient(circle at 58% 42%, #e5d8f6a8 0 6%, transparent 12%),
+    radial-gradient(circle, transparent 42%, #e5d8f629 43%, transparent 44%);
+  border: 1px solid #e5d8f629;
+}
+.mood-unwind { --mood-accent: #a5f3e8; --mood-art: linear-gradient(#5be8d5, #106879 53%, #101c27); }
+.mood-unwind::before {
+  top: 21%; left: 50%; width: 39%; aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%;
+  background: linear-gradient(#e9e1d2bf, #a496c4ad); filter: blur(1px);
+}
+.mood-unwind::after {
+  top: 46.5%; left: 0; width: 100%; height: 10%;
+  background:
+    linear-gradient(#abebde54, #abebde54) top / 100% 1px no-repeat,
+    linear-gradient(#abebde3b, #abebde3b) center / 78% 1px no-repeat,
+    linear-gradient(#abebde24, #abebde24) bottom / 55% 1px no-repeat;
+}
+.mood-energy { --mood-accent: #ffe396; --mood-art: linear-gradient(135deg, #ffd459, #f33960 46%, #5b133a); }
+.mood-energy::before {
+  top: 16%; left: -12%; width: 135%; height: 17%; transform: rotate(-23deg);
+  border-block: 7px solid #ffd5ab5c; box-shadow: 0 9px 24px #ffca9d38;
+}
+.mood-nostalgia { --mood-accent: #ffd0ee; --mood-art: linear-gradient(135deg, #f077c0, #7920bd 47%, #240a46); }
+.mood-nostalgia::before {
+  top: 13%; left: 50%; width: 62%; aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%;
+  background:
+    radial-gradient(circle, #0b0910 0 3%, transparent 3.6%),
+    radial-gradient(circle, #bc9997 0 21%, transparent 22%),
+    repeating-radial-gradient(circle, #101018 0 2px, #24212a 2px 3px, #101018 3px 4px);
+  box-shadow: 0 10px 26px #0c061b66, inset 0 0 15px #000b;
+}
+.how-section { margin-top: clamp(54px, 7vw, 118px); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.how-steps {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); list-style: none;
+  border: 1px solid #ffffff15; border-radius: clamp(20px, 2.3vw, 41px); overflow: hidden;
+  background: linear-gradient(130deg, #141222, #11101c);
+}
+.how-step {
+  display: flex; flex-direction: column; padding: clamp(22px, 2.8vw, 50px);
+}
+.how-step + .how-step { border-inline-start: 1px solid #ffffff14; }
+.how-step-mark {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: clamp(22px, 3vw, 54px);
+  color: #a19bad; font: 400 clamp(11px, .81vw, 14px)/1 var(--fm);
+}
+.how-step-mark svg { color: var(--lavender); }
+.how-step:nth-child(2) .how-step-mark svg { color: var(--aqua); }
+.how-step:nth-child(3) .how-step-mark svg { color: #f6a9d8; }
+.how-step h3 { font: 400 clamp(32px, 2.65vw, 48px)/1 var(--display); }
+.how-step p { margin-top: clamp(10px, 1.05vw, 19px); color: var(--muted); font: 400 clamp(14px, 1vw, 18px)/1.6 var(--fd); }
 
 @media (max-width: 1050px) {
   :root { --gutter: clamp(20px, 5vw, 56px); }
@@ -753,6 +826,10 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   .station-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .station-card { grid-template-rows: auto 1fr; }
   .station-card-art { font-size: clamp(25px, 7vw, 36px); }
+  .mood { aspect-ratio: .8; }
+  .how-steps { grid-template-columns: 1fr; }
+  .how-step + .how-step { border-inline-start: 0; border-top: 1px solid #ffffff14; }
+  .how-step-mark { margin-bottom: 15px; }
 }
 @media (max-width: 450px) {
   .hero-grid { gap: 38px; }
@@ -770,8 +847,6 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   .hero-player .pc-eq { gap: 2px; margin-block: 14px 9px; }
   .hero-player .pc-controls { gap: 2px; }
   .hero-player #vol { width: clamp(52px, 16vw, 76px); }
-  .mood-actions { position: static; margin-bottom: 15px; }
-  .mood-arrow { display: none; }
 }
 @media (max-width: 390px) {
   .brand { font-size: 21px; gap: 6px; }
@@ -805,6 +880,24 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   </header>
 
   <main id="main">
+    <div class="station-strip" id="stationStrip">
+      <div class="station-strip-window">
+        <div class="station-strip-track">
+          <ul aria-label="Featured stations">
+            <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="2">Neon <i>Eighties</i></button></li>
+            <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="3">Nineties <i>Mixtape</i></button></li>
+            <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="6">Classical <i>Hall</i></button></li>
+            <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="7">PurePlay <i>Relax</i></button></li>
+            <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="8">Pulse <i>Electronic</i></button></li>
+          </ul>
+        </div>
+      </div>
+      <button class="strip-motion" id="stripMotion" type="button" aria-label="Pause station banner" hidden>
+        <svg class="strip-motion-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.8v14.4L20 12z"/></svg>
+        <svg class="strip-motion-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>
+      </button>
+    </div>
+
     <section class="hero" aria-labelledby="heroTitle">
       <div class="hero-grid site-width">
         <div class="hero-copy">
@@ -880,55 +973,78 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
       </div>
     </section>
 
-    <div class="station-catalog" id="radio">
-      <div class="station-strip" id="stationStrip">
-        <div class="station-strip-window">
-          <div class="station-strip-track">
-            <ul aria-label="Featured stations">
-              <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="2">Neon <i>Eighties</i></button></li>
-              <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="3">Nineties <i>Mixtape</i></button></li>
-              <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="6">Classical <i>Hall</i></button></li>
-              <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="7">PurePlay <i>Relax</i></button></li>
-              <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="8">Pulse <i>Electronic</i></button></li>
-            </ul>
-          </div>
+    <section class="station-section" id="radio" aria-labelledby="stationHeading">
+      <div class="station-heading">
+        <div>
+          <p class="station-kicker">Stations</p>
+          <h2 id="stationHeading">Choose a <i>station.</i></h2>
+          <p class="station-hint">Your favorites, from every decade. One tap to tune in.</p>
         </div>
-        <button class="strip-motion" id="stripMotion" type="button" aria-label="Pause station banner" hidden>
-          <svg class="strip-motion-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.8v14.4L20 12z"/></svg>
-          <svg class="strip-motion-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>
-        </button>
+        <div class="station-filters" id="stationFilters" role="group" aria-label="Filter stations"></div>
       </div>
-
-      <section class="station-section" aria-labelledby="stationHeading">
-        <div class="station-heading">
-          <div>
-            <p class="station-kicker">Stations</p>
-            <h2 id="stationHeading">Choose a <i>station.</i></h2>
-            <p class="station-hint">Your favorites, from every decade. One tap to tune in.</p>
-          </div>
-          <div class="station-filters" id="stationFilters" role="group" aria-label="Filter stations"></div>
-        </div>
-        <ul class="station-grid" id="stationGrid" aria-label="Radio stations"></ul>
-      </section>
-    </div>
+      <ul class="station-grid" id="stationGrid" aria-label="Radio stations"></ul>
+    </section>
 
     <div class="discovery site-width">
       <section class="mood-section" id="moods" aria-labelledby="moodHeading">
-        <h2 id="moodHeading">Pick by mood</h2>
-        <p class="mood-hint">Find a station for how you want to feel.</p>
-        <div class="mood-actions">
-          <button class="surprise-button" id="surpriseMe" type="button">Surprise me <span aria-hidden="true">↗</span></button>
+        <div class="mood-heading">
+          <div>
+            <p class="mood-kicker">Moods</p>
+            <h2 id="moodHeading">Not sure what <i>to play?</i></h2>
+            <p class="mood-hint">Let your mood pick a station.</p>
+          </div>
+          <button class="surprise-button" id="surpriseMe" type="button">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="2" transform="rotate(45 8 8)"/><path d="M14 11h5a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2v-5"/><path d="M6 6h.01M10 10h.01M14 17h.01M18 15h.01" stroke-width="2.6" stroke-linecap="round"/></svg>
+            Surprise me
+          </button>
         </div>
-        <div class="moods" aria-label="Choose a mood">
-          <button class="mood" data-station="6"><span class="mood-icon" aria-hidden="true">◎</span><span>Focus<small>Space to think</small></span><span class="mood-arrow" aria-hidden="true">↗</span></button>
-          <button class="mood" data-station="7"><span class="mood-icon" aria-hidden="true">≈</span><span>Unwind<small>Take it slow</small></span><span class="mood-arrow" aria-hidden="true">↗</span></button>
-          <button class="mood" data-station="8"><span class="mood-icon" aria-hidden="true">ϟ</span><span>Energy<small>Turn it up</small></span><span class="mood-arrow" aria-hidden="true">↗</span></button>
-          <button class="mood" data-station="2"><span class="mood-icon" aria-hidden="true">◷</span><span>Nostalgia<small>Back to the good days</small></span><span class="mood-arrow" aria-hidden="true">↗</span></button>
+        <div class="moods" role="group" aria-label="Choose a mood">
+          <button class="mood mood-focus" data-station="6" type="button">
+            <span class="mood-icon" aria-hidden="true">◎</span>
+            <span class="mood-copy"><span class="mood-name">Focus</span><span class="mood-caption">Space to think</span></span>
+          </button>
+          <button class="mood mood-unwind" data-station="7" type="button">
+            <span class="mood-icon" aria-hidden="true">≋</span>
+            <span class="mood-copy"><i class="mood-name">Unwind</i><span class="mood-caption">Take it slow</span></span>
+          </button>
+          <button class="mood mood-energy" data-station="8" type="button">
+            <span class="mood-icon" aria-hidden="true">ϟ</span>
+            <span class="mood-copy"><span class="mood-name">Energy</span><span class="mood-caption">Turn it up</span></span>
+          </button>
+          <button class="mood mood-nostalgia" data-station="2" type="button">
+            <span class="mood-icon" aria-hidden="true">◉</span>
+            <span class="mood-copy"><i class="mood-name">Nostalgia</i><span class="mood-caption">Back to the good days</span></span>
+          </button>
         </div>
       </section>
       <section class="how-section" id="how-it-works" aria-labelledby="howHeading">
-        <h2 id="howHeading">How it works</h2>
-        <p>Choose a station to tune in live. Use the arrows to switch stations, or open the full player to browse the dial while you listen.</p>
+        <h2 class="visually-hidden" id="howHeading">How it works</h2>
+        <ol class="how-steps" role="list">
+          <li class="how-step">
+            <div class="how-step-mark" aria-hidden="true">
+              <span>01</span>
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 12v9M8 5a6 6 0 0 0 0 7m8-7a6 6 0 0 1 0 7M4 3a10 10 0 0 0 0 11M20 3a10 10 0 0 1 0 11"/><circle cx="12" cy="8" r="1.4" fill="currentColor" stroke="none"/></svg>
+            </div>
+            <h3>Pick a <i>station.</i></h3>
+            <p>Browse by decade, genre or language. Every stream is handpicked.</p>
+          </li>
+          <li class="how-step">
+            <div class="how-step-mark" aria-hidden="true">
+              <span>02</span>
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-2.5 5v10l8-5-8-5Z"/></svg>
+            </div>
+            <h3>Press <i>play.</i></h3>
+            <p>Tune in live with one tap. No account needed.</p>
+          </li>
+          <li class="how-step">
+            <div class="how-step-mark" aria-hidden="true">
+              <span>03</span>
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3 10h13v5a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5z"/><path d="M16 10h2a2.5 2.5 0 0 1 0 5h-2M8 7c2-1 .1-2.4 0-3.6M12 7c2-1 .1-2.4 0-3.6"/></svg>
+            </div>
+            <h3>Stay a <i>while.</i></h3>
+            <p>Let it play in the background while you work, unwind or travel back in time.</p>
+          </li>
+        </ol>
       </section>
     </div>
   </main>
