@@ -570,10 +570,12 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 .hero-player #vol::-webkit-slider-thumb { background: white; box-shadow: 0 0 0 4px #b29afa43; }
 .hero-player #vol::-moz-range-thumb { width: 17px; height: 17px; background: white; border: 0; border-radius: 50%; box-shadow: 0 0 0 4px #b29afa43; }
 
+.station-catalog { scroll-margin-top: var(--header-height); }
 .station-strip { background: #ffffff03; border-block: 1px solid #ffffff0c; }
 .station-strip ul {
   display: flex; justify-content: space-evenly; gap: clamp(15px, 2.1vw, 40px);
-  overflow-x: auto; list-style: none; padding: clamp(12px, 1.5vw, 28px) clamp(14px, 1.6vw, 30px);
+  overflow-x: auto; scrollbar-width: none; list-style: none;
+  padding: clamp(12px, 1.5vw, 28px) clamp(14px, 1.6vw, 30px);
 }
 .station-strip li { display: flex; align-items: center; gap: clamp(15px, 2.1vw, 40px); flex-shrink: 0; }
 .strip-star { color: #cbb7ff; font-size: clamp(13px, 1.2vw, 22px); }
@@ -589,7 +591,6 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 .station-section {
   width: min(92%, 1644px); margin-inline: auto;
   padding: clamp(52px, 8.4vw, 150px) clamp(12px, 2.45vw, 44px) clamp(42px, 4vw, 70px);
-  scroll-margin-top: var(--header-height);
   background: linear-gradient(160deg, #100e1e, #0e0d1a 58%, #100e1c);
 }
 .station-heading {
@@ -759,11 +760,13 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   .mood-actions { position: static; margin-bottom: 15px; }
   .mood-arrow { display: none; }
 }
-@media (max-width: 360px) {
-  .brand { font-size: 23px; gap: 7px; }
-  .brand-wave { width: 38px; }
+@media (max-width: 390px) {
+  .brand { font-size: 21px; gap: 6px; }
+  .brand-wave { width: 32px; }
   .nav-listen { font-size: 13px; padding-left: .85em; }
-  .site-nav { column-gap: 8px; }
+  .site-nav { width: calc(100% - 26px); column-gap: 8px; }
+  .station-filters { gap: 2px; padding: 4px; }
+  .station-filters button { padding-inline: 7px; gap: .35em; font-size: 12px; }
 }
 </style>
 </head>
@@ -865,27 +868,29 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
       </div>
     </section>
 
-    <div class="station-strip">
-      <ul aria-label="Featured stations">
-        <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="2">Neon <i>Eighties</i></button></li>
-        <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="3">Nineties <i>Mixtape</i></button></li>
-        <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="6">Classical <i>Hall</i></button></li>
-        <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="7">PurePlay <i>Relax</i></button></li>
-        <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="8">Pulse <i>Electronic</i></button></li>
-      </ul>
-    </div>
-
-    <section class="station-section" id="radio" aria-labelledby="stationHeading">
-      <div class="station-heading">
-        <div>
-          <p class="station-kicker">Stations</p>
-          <h2 id="stationHeading">Choose a <i>station.</i></h2>
-          <p class="station-hint">Your favorites, from every decade. One tap to tune in.</p>
-        </div>
-        <div class="station-filters" id="stationFilters" role="group" aria-label="Filter stations"></div>
+    <div class="station-catalog" id="radio">
+      <div class="station-strip">
+        <ul aria-label="Featured stations">
+          <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="2">Neon <i>Eighties</i></button></li>
+          <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="3">Nineties <i>Mixtape</i></button></li>
+          <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="6">Classical <i>Hall</i></button></li>
+          <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="7">PurePlay <i>Relax</i></button></li>
+          <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="8">Pulse <i>Electronic</i></button></li>
+        </ul>
       </div>
-      <ul class="station-grid" id="stationGrid" aria-label="Radio stations"></ul>
-    </section>
+
+      <section class="station-section" aria-labelledby="stationHeading">
+        <div class="station-heading">
+          <div>
+            <p class="station-kicker">Stations</p>
+            <h2 id="stationHeading">Choose a <i>station.</i></h2>
+            <p class="station-hint">Your favorites, from every decade. One tap to tune in.</p>
+          </div>
+          <div class="station-filters" id="stationFilters" role="group" aria-label="Filter stations"></div>
+        </div>
+        <ul class="station-grid" id="stationGrid" aria-label="Radio stations"></ul>
+      </section>
+    </div>
 
     <div class="discovery site-width">
       <section class="mood-section" id="moods" aria-labelledby="moodHeading">
