@@ -395,14 +395,14 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 }
 .brand i { color: var(--muted); }
 .brand-wave { display: block; width: clamp(49px, 4.3vw, 80px); height: auto; }
-.site-links, .nav-actions, .hero-buttons { display: flex; align-items: center; }
+.site-links, .hero-buttons { display: flex; align-items: center; }
 .site-links { gap: clamp(16px, 2.5vw, 46px); list-style: none; }
 .site-links a {
   display: flex; align-items: center; min-height: 44px;
   color: var(--muted); font-size: clamp(14px, 1vw, 18px); white-space: nowrap;
 }
 .site-links a:hover { color: var(--text); }
-.nav-actions { justify-self: end; gap: clamp(8px, .8vw, 15px); }
+.live-count { justify-self: end; }
 .live-count, .hero-player .pc-live {
   display: inline-flex; align-items: center; gap: 9px; border: 1px solid #63e7d531;
   border-radius: 999px; background: #63e7d50c; color: #83eee0;
@@ -413,18 +413,14 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   content: ''; width: 8px; height: 8px; background: var(--aqua);
   border-radius: 50%; box-shadow: 0 0 0 4px #63e7d52f, 0 0 12px #63e7d56b;
 }
-.nav-listen, .hero-listen, .hero-moods {
+.hero-listen, .hero-moods {
   display: inline-flex; justify-content: center; align-items: center; gap: .76em; white-space: nowrap;
   min-height: 44px; border-radius: 999px; border: 1px solid transparent; cursor: pointer;
   font: 600 clamp(15px, 1.14vw, 22px)/1.15 var(--fd);
   transition: background-color .2s, box-shadow .2s, border-color .2s, transform .2s;
 }
-.nav-listen { padding: .48em .5em .48em 1.26em; color: #0b0a10; background: #fff; font-size: clamp(14px, .98vw, 18px); }
 .button-icon { display: grid; place-items: center; width: 2.45em; aspect-ratio: 1; border-radius: 50%; color: #fff; background: #0c0b12; }
-.nav-listen .button-icon { width: 2em; }
-.nav-listen:hover, .hero-listen:hover { transform: translateY(-2px); }
-.nav-listen:hover { background: #eae2ff; }
-.hero-listen:hover { box-shadow: 0 8px 46px #b29afa61; }
+.hero-listen:hover { transform: translateY(-2px); box-shadow: 0 8px 46px #b29afa61; }
 
 .hero {
   position: relative;
@@ -834,7 +830,7 @@ i.mood-name { font-style: italic; }
 }
 @media (max-width: 820px) {
   :root { --header-height: 112px; }
-  .site-nav { grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; min-height: var(--header-height); padding-top: 8px; }
+  .site-nav { grid-template-columns: minmax(0, 1fr); gap: 0; min-height: var(--header-height); padding-top: 8px; }
   .site-links { grid-row: 2; grid-column: 1 / -1; justify-content: center; gap: clamp(18px, 6vw, 38px); border-top: 1px solid #ffffff10; }
   .hero-grid { grid-template-columns: minmax(0, 1fr); max-width: 620px; gap: 44px; padding-block: 54px 42px; }
   .hero h1 { font-size: clamp(57px, 11.5vw, 100px); }
@@ -875,8 +871,7 @@ i.mood-name { font-style: italic; }
 @media (max-width: 390px) {
   .brand { font-size: 21px; gap: 6px; }
   .brand-wave { width: 32px; }
-  .nav-listen { font-size: 13px; padding-left: .85em; }
-  .site-nav { width: calc(100% - 26px); column-gap: 8px; }
+  .site-nav { width: calc(100% - 26px); }
   .station-filters { gap: 2px; padding: 4px; }
   .station-filters button { padding-inline: 7px; gap: .35em; font-size: 12px; }
 }
@@ -894,12 +889,7 @@ i.mood-name { font-style: italic; }
         <li><a href="#moods">Moods</a></li>
         <li><a href="#how-it-works">How it works</a></li>
       </ul>
-      <div class="nav-actions">
-        <span class="live-count"><span data-station-count>11</span> live</span>
-        <button class="nav-listen" id="navListen" type="button">
-          Listen now <span class="button-icon" aria-hidden="true">↗</span>
-        </button>
-      </div>
+      <span class="live-count"><span data-station-count>11</span> live</span>
     </nav>
   </header>
 
@@ -1501,7 +1491,6 @@ function tuneAndReveal({ station, animation, align = false } = {}) {
   }
 }
 
-document.getElementById('navListen').addEventListener('click', () => tuneAndReveal());
 const heroListen = document.getElementById('heroListen');
 const heroListenLabel = document.getElementById('heroListenLabel');
 heroListen.addEventListener('click', () => tuneAndReveal({ align: true }));
