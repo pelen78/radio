@@ -1,6 +1,7 @@
-/* Nimbus Radio — app shell v3.1.1 */
+/* Nimbus Radio — app shell v3.1.2 */
 const CACHE_PREFIX = 'nimbus-radio-';
-const CACHE_NAME = `${CACHE_PREFIX}v3.1.1`;
+const CACHE_NAME = `${CACHE_PREFIX}v3.1.2`;
+const isRedirectHost = self.location.hostname === 'nimbusradio.app';
 const SHELL = [
   './', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png',
@@ -11,8 +12,10 @@ const HOME = self.registration.scope;
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    await cache.addAll(SHELL);
+    if (!isRedirectHost) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.addAll(SHELL);
+    }
     // Repair release: replace the worker that prevents existing users opening the app.
     await self.skipWaiting();
   })());
@@ -32,6 +35,9 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Let the network redirect requests from the old host, including installed app launches.
+  if (isRedirectHost) return;
+
   const request = event.request;
   const url = new URL(request.url);
   // Audio, remote streams, external fonts and feedback bypass this cache.
