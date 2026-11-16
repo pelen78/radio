@@ -812,6 +812,17 @@ i.mood-name { font-style: italic; }
 .how-step:nth-child(3) .how-step-mark svg { color: #f6a9d8; }
 .how-step h3 { font: 400 clamp(32px, 2.65vw, 48px)/1 var(--display); }
 .how-step p { margin-top: clamp(10px, 1.05vw, 19px); color: var(--muted); font: 400 clamp(14px, 1vw, 18px)/1.6 var(--fd); }
+.back-to-top {
+  position: fixed; z-index: 210; inset-inline-end: max(18px, env(safe-area-inset-right));
+  inset-block-end: calc(80px + env(safe-area-inset-bottom));
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 46px; min-height: 46px; padding-inline: 14px; border: 1px solid #b29afa66;
+  border-radius: 999px; background: #191524; color: var(--text); box-shadow: 0 6px 24px #0005;
+  text-decoration: none; font: 500 14px/1 var(--fd); transition: background-color .2s, border-color .2s;
+}
+.back-to-top[hidden] { display: none; }
+.back-to-top:hover { background: #272035; border-color: var(--aqua); }
+.back-to-top svg { color: var(--aqua); }
 
 @media (max-width: 1050px) {
   :root { --gutter: clamp(20px, 5vw, 56px); }
@@ -843,6 +854,8 @@ i.mood-name { font-style: italic; }
   .how-step-mark { margin-bottom: 15px; }
 }
 @media (max-width: 450px) {
+  .back-to-top { padding-inline: 0; }
+  .back-to-top span { display: none; }
   .hero-grid { gap: 38px; }
   .hero h1 { font-size: clamp(51px, 12.75vw, 62px); }
   .hero-stats { justify-content: space-between; }
@@ -890,7 +903,7 @@ i.mood-name { font-style: italic; }
     </nav>
   </header>
 
-  <main id="main">
+  <main id="main" tabindex="-1">
     <div class="station-strip" id="stationStrip">
       <div class="station-strip-window">
         <div class="station-strip-track">
@@ -1062,6 +1075,10 @@ i.mood-name { font-style: italic; }
         </ol>
       </section>
     </div>
+    <a class="back-to-top" id="backToTop" href="#main" aria-label="Back to top" title="Back to top" hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg>
+      <span>Back to top</span>
+    </a>
   </main>
   <!-- FULL PLAYER MODAL -->
   <div class="fp-overlay" id="fpOverlay" inert>
@@ -1197,6 +1214,16 @@ let currentId = null, isPlaying = false;
 const audio = document.getElementById('audio');
 const player = document.getElementById('playerCard');
 const siteHeader = document.getElementById('siteHeader');
+const stationSection = document.getElementById('radio');
+const backToTop = document.getElementById('backToTop');
+function syncBackToTop() {
+  backToTop.hidden = stationSection.getBoundingClientRect().top > siteHeader.offsetHeight + 4;
+}
+window.addEventListener('scroll', syncBackToTop, { passive: true });
+window.addEventListener('resize', syncBackToTop);
+window.addEventListener('pageshow', syncBackToTop);
+syncBackToTop();
+
 const playerTime = document.getElementById('pcTime');
 const featuredButtons = document.querySelectorAll('[data-featured-station]');
 document.querySelectorAll('[data-station-count]').forEach(el => el.textContent = STATIONS.length);
