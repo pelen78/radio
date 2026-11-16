@@ -497,18 +497,7 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 .pc-art-img { position: absolute; inset: 0; display: none; width: 100%; height: 100%; object-fit: cover; }
 .pc-art-img.visible { display: block; }
 .pc-art-emoji { font-size: clamp(32px, 5vw, 88px); }
-.pc-art.has-img .pc-art-emoji, .pc-art.is-relax .pc-art-emoji, .pc-art.is-relax .pc-art-img { display: none; }
-.relax-art { display: none; }
-.pc-art.is-relax .relax-art {
-  display: block; position: absolute; inset: 0;
-  background:
-    radial-gradient(circle at 23% 19%, #f4e4ff 0 1.5px, transparent 3.5px),
-    radial-gradient(circle at 80% 31%, #71e8da 0 2px, transparent 5px),
-    radial-gradient(circle at 17% 75%, #e6aefa 0 1.5px, transparent 3.5px),
-    radial-gradient(circle, #e9fff8 0 20%, transparent 20.7%),
-    repeating-radial-gradient(circle, transparent 0 15%, #caa6ff2c 15.3%, transparent 16.1% 30.5%),
-    radial-gradient(ellipse at 50% 57%, #7bebd7 1%, #6752d6 36%, #3a1269 57%, #11071a 74%, #0c0a12 83%);
-}
+.pc-art.has-img .pc-art-emoji { display: none; }
 .pc-art-tag {
   position: absolute; top: 6%; left: 6%; padding: .45em .85em; border-radius: 999px;
   background: #0b0712df; color: #fff; white-space: nowrap;
@@ -516,15 +505,17 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 }
 .pc-art-tag::before { content: ''; display: inline-block; width: .53em; height: .53em; border-radius: 50%; margin-right: .55em; background: #ff8588; vertical-align: .07em; }
 .pc-feature {
-  position: absolute; left: -20%; top: 28%; display: flex; align-items: center; gap: 10px;
+  position: absolute; left: -12%; bottom: 7%; display: flex; align-items: center; gap: 10px;
+  max-width: calc(100% + 8px);
   padding: clamp(8px, .85vw, 16px) clamp(10px, 1.05vw, 20px);
   border: 1px solid #d8c3ff30; border-radius: clamp(11px, 1vw, 20px);
   background: #191326f5; box-shadow: 0 8px 26px #0003; color: #fcf7ff;
   white-space: nowrap; font: 600 clamp(11px, .94vw, 18px)/1.3 var(--fd);
 }
 .pc-feature small { display: block; color: #b0a4be; font: 400 clamp(8px, .6vw, 11px)/1.5 var(--fm); letter-spacing: .09em; text-transform: uppercase; }
-.pc-feature-icon { display: grid; width: clamp(24px, 2.45vw, 45px); aspect-ratio: 1; place-items: center; border-radius: 50%; background: #b29afa21; color: #d7bbff; }
-.pc-feature[hidden] { display: none; }
+.pc-feature-icon { display: grid; flex-shrink: 0; width: clamp(24px, 2.45vw, 45px); aspect-ratio: 1; place-items: center; border-radius: 50%; background: #b29afa21; color: #d7bbff; }
+.pc-feature-copy { min-width: 0; }
+.pc-feature-name { display: block; overflow: hidden; text-overflow: ellipsis; }
 .pc-top { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
 .hero-player .pc-live { max-width: calc(100% - 45px); white-space: normal; min-height: 29px; padding: .6em .9em; }
 .hero-player .dot-live { flex: 0 0 7px; width: 7px; height: 7px; }
@@ -571,22 +562,45 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 .hero-player #vol::-moz-range-thumb { width: 17px; height: 17px; background: white; border: 0; border-radius: 50%; box-shadow: 0 0 0 4px #b29afa43; }
 
 .station-catalog { scroll-margin-top: var(--header-height); }
-.station-strip { background: #ffffff03; border-block: 1px solid #ffffff0c; }
+.station-strip {
+  --strip-gap: clamp(15px, 2.1vw, 40px);
+  display: flex; align-items: center;
+  background: #ffffff03; border-block: 1px solid #ffffff0c;
+}
+.station-strip-window { flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; container-type: inline-size; }
+.station-strip-track { display: flex; width: max-content; }
 .station-strip ul {
-  display: flex; justify-content: space-evenly; gap: clamp(15px, 2.1vw, 40px);
-  overflow-x: auto; scrollbar-width: none; list-style: none;
-  padding: clamp(12px, 1.5vw, 28px) clamp(14px, 1.6vw, 30px);
+  display: flex; flex-shrink: 0; justify-content: space-around; min-width: 100cqi; gap: var(--strip-gap);
+  list-style: none; padding: clamp(12px, 1.5vw, 28px) calc(var(--strip-gap) / 2);
 }
 .station-strip li { display: flex; align-items: center; gap: clamp(15px, 2.1vw, 40px); flex-shrink: 0; }
 .strip-star { color: #cbb7ff; font-size: clamp(13px, 1.2vw, 22px); }
 .station-strip li:nth-child(3n + 2) .strip-star { color: var(--aqua); }
 .station-strip li:nth-child(3n) .strip-star { color: #f9a9d4; }
-.station-strip button {
+.strip-station {
+  display: inline-flex; align-items: center; gap: .15em;
   border: 0; background: transparent; cursor: pointer; min-height: 44px;
   color: #e3dfe9; white-space: nowrap; font: 400 clamp(27px, 2.55vw, 48px)/1.2 var(--display);
 }
-.station-strip button i { color: #aaa4b2; }
-.station-strip button:hover, .station-strip button:hover i { color: var(--aqua); }
+.strip-station i { color: #aaa4b2; }
+.strip-station:hover, .strip-station:hover i { color: var(--aqua); }
+.strip-motion {
+  display: grid; place-items: center; flex: 0 0 44px; height: 44px;
+  margin-inline: 8px; border: 1px solid #ffffff18; border-radius: 50%;
+  background: #181621; color: #cbc2d9; cursor: pointer;
+}
+.strip-motion:hover { color: var(--aqua); }
+.strip-motion[hidden], .station-strip .station-strip-copy, .strip-motion-pause { display: none; }
+.station-strip:is([data-motion="on"], [data-motion="paused"]) .station-strip-window { overflow: hidden; }
+.station-strip:is([data-motion="on"], [data-motion="paused"]) .station-strip-track { animation: station-scroll 45s linear infinite; }
+.station-strip:is([data-motion="on"], [data-motion="paused"]) .station-strip-copy { display: flex; }
+.station-strip[data-motion="paused"] .station-strip-track { animation-play-state: paused; }
+.station-strip[data-motion="on"] .strip-motion-play { display: none; }
+.station-strip[data-motion="on"] .strip-motion-pause { display: block; }
+@keyframes station-scroll { to { transform: translateX(-50%); } }
+@media (hover: hover) {
+  .station-strip[data-motion="on"] .station-strip-window:hover .station-strip-track { animation-play-state: paused; }
+}
 
 .station-section {
   width: min(92%, 1644px); margin-inline: auto;
@@ -732,7 +746,6 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   .hero-player .pc-name { font-size: clamp(30px, 6.3vw, 55px); }
   .hero-player .pc-eq { margin-block: 20px; }
   .pc-feature { left: -5%; }
-  .station-strip ul { justify-content: flex-start; }
   .moods { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 620px) {
@@ -821,17 +834,16 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
           </button>
           <div class="pc-body">
             <div class="pc-art-wrap" aria-hidden="true">
-              <div class="pc-art is-relax">
+              <div class="pc-art">
                 <img class="pc-art-img" id="pcImg" alt="">
-                <div class="relax-art"></div>
                 <div class="pc-art-emoji" id="pcEmoji">📻</div>
                 <span class="pc-art-tag">Live</span>
               </div>
-              <div class="pc-feature" id="pcFeature">
+              <div class="pc-feature">
                 <span class="pc-feature-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10v4m4-7v10m4-13v16m4-13v10m4-7v4"/></svg>
                 </span>
-                <span>PurePlay Relax<small>Featured station</small></span>
+                <span class="pc-feature-copy"><span class="pc-feature-name" id="pcFeatureName">PurePlay Relax</span><small id="pcFeatureLabel">Featured station</small></span>
               </div>
             </div>
             <div class="pc-top">
@@ -869,14 +881,22 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
     </section>
 
     <div class="station-catalog" id="radio">
-      <div class="station-strip">
-        <ul aria-label="Featured stations">
-          <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="2">Neon <i>Eighties</i></button></li>
-          <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="3">Nineties <i>Mixtape</i></button></li>
-          <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="6">Classical <i>Hall</i></button></li>
-          <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="7">PurePlay <i>Relax</i></button></li>
-          <li><span class="strip-star" aria-hidden="true">✱</span><button type="button" data-featured-station="8">Pulse <i>Electronic</i></button></li>
-        </ul>
+      <div class="station-strip" id="stationStrip">
+        <div class="station-strip-window">
+          <div class="station-strip-track">
+            <ul aria-label="Featured stations">
+              <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="2">Neon <i>Eighties</i></button></li>
+              <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="3">Nineties <i>Mixtape</i></button></li>
+              <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="6">Classical <i>Hall</i></button></li>
+              <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="7">PurePlay <i>Relax</i></button></li>
+              <li><span class="strip-star" aria-hidden="true">✱</span><button class="strip-station" type="button" data-featured-station="8">Pulse <i>Electronic</i></button></li>
+            </ul>
+          </div>
+        </div>
+        <button class="strip-motion" id="stripMotion" type="button" aria-label="Pause station banner" hidden>
+          <svg class="strip-motion-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.8v14.4L20 12z"/></svg>
+          <svg class="strip-motion-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>
+        </button>
       </div>
 
       <section class="station-section" aria-labelledby="stationHeading">
@@ -1249,16 +1269,10 @@ function loadStation(s, autoplay = true) {
   featuredButtons.forEach(b => b.setAttribute('aria-pressed', Number(b.dataset.featuredStation) === s.id));
   currentId = s.id;
   const artEl = document.querySelector('.pc-art');
-  const imgEl = document.getElementById('pcImg');
   const isRelax = s.id === 7;
-  const hasImage = Boolean(s.img && !isRelax);
-  if (hasImage) imgEl.src = s.img;
-  else imgEl.removeAttribute('src');
-  imgEl.classList.toggle('visible', hasImage);
-  artEl.classList.toggle('has-img', hasImage);
-  artEl.classList.toggle('is-relax', isRelax);
-  document.getElementById('pcEmoji').textContent = s.emoji;
-  document.getElementById('pcFeature').hidden = !isRelax;
+  setStationArtwork(s, artEl, document.getElementById('pcImg'), document.getElementById('pcEmoji'));
+  document.getElementById('pcFeatureName').textContent = s.name;
+  document.getElementById('pcFeatureLabel').textContent = isRelax ? 'Featured station' : 'Selected station';
   const nameEl = document.getElementById('pcName');
   if (isRelax) {
     const emphasis = document.createElement('i');
@@ -1276,6 +1290,15 @@ function loadStation(s, autoplay = true) {
   if (typeof syncModalFn === 'function') syncModalFn(s);
 }
 
+function setStationArtwork(station, art, image, placeholder) {
+  if (station.img) {
+    if (image.getAttribute('src') !== station.img) image.src = station.img;
+  } else image.removeAttribute('src');
+  image.classList.toggle('visible', Boolean(station.img));
+  art.classList.toggle('has-img', Boolean(station.img));
+  placeholder.textContent = station.emoji;
+}
+
 function revealPlayer() {
   player.focus({ preventScroll: true });
   const bounds = player.getBoundingClientRect();
@@ -1291,10 +1314,54 @@ function startListening() {
 
 document.getElementById('navListen').addEventListener('click', startListening);
 document.getElementById('heroListen').addEventListener('click', startListening);
-featuredButtons.forEach(button => button.addEventListener('click', () => {
-  loadStation(STATIONS.find(station => station.id === Number(button.dataset.featuredStation)));
-  revealPlayer();
-}));
+function initStationBanner() {
+  const strip = document.getElementById('stationStrip');
+  const viewport = strip.querySelector('.station-strip-window');
+  const track = strip.querySelector('.station-strip-track');
+  const toggle = document.getElementById('stripMotion');
+  const original = track.querySelector('ul');
+  const copy = original.cloneNode(true);
+  copy.classList.add('station-strip-copy');
+  copy.removeAttribute('aria-label');
+  copy.setAttribute('aria-hidden', 'true');
+  // Repeat the visuals without adding duplicate controls to the tab order.
+  copy.querySelectorAll('button').forEach(button => {
+    const station = document.createElement('span');
+    station.className = button.className;
+    station.dataset.featuredStation = button.dataset.featuredStation;
+    station.append(...button.childNodes);
+    button.replaceWith(station);
+  });
+  track.append(copy);
+
+  function setMotion(state) {
+    if (state === 'on' && strip.dataset.motion === 'off') viewport.scrollLeft = 0;
+    strip.dataset.motion = state;
+    toggle.setAttribute('aria-label', state === 'on' ? 'Pause station banner' : 'Resume station banner');
+  }
+
+  function syncMotionPreference() {
+    toggle.hidden = reducedMotion.matches;
+    setMotion(reducedMotion.matches ? 'off' : 'on');
+  }
+
+  syncMotionPreference();
+  reducedMotion.addEventListener('change', syncMotionPreference);
+  toggle.addEventListener('click', () => setMotion(strip.dataset.motion === 'on' ? 'paused' : 'on'));
+  original.addEventListener('focusin', event => {
+    if (strip.dataset.motion !== 'off' && event.target.matches(':focus-visible')) {
+      setMotion('off');
+      event.target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+    }
+  });
+  track.addEventListener('click', event => {
+    const stationButton = event.target.closest('[data-featured-station]');
+    if (!stationButton) return;
+    loadStation(STATIONS.find(station => station.id === Number(stationButton.dataset.featuredStation)));
+    revealPlayer();
+  });
+}
+initStationBanner();
 
 let playRequest = 0;
 let connectionTimer;
@@ -1511,15 +1578,7 @@ muteButton.addEventListener('click', () => {
     }
 
     // art
-    if (s && s.img) {
-      fpImg.src = s.img;
-      fpImg.onload = () => { fpImg.classList.add('visible'); fpArt.classList.add('has-img'); };
-    } else {
-      fpImg.src = '';
-      fpImg.classList.remove('visible');
-      fpArt.classList.remove('has-img');
-      if (s) fpEmoji.textContent = s.emoji || '📻';
-    }
+    if (s) setStationArtwork(s, fpArt, fpImg, fpEmoji);
 
     // play/pause icons
     fpIPlay.style.display  = isPlaying ? 'none' : '';
