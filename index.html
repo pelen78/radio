@@ -458,6 +458,14 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   background: var(--spectrum); color: #0a1015;
   box-shadow: 0 8px 38px #b29afa43;
 }
+.hero-listen .listening-icon,
+.hero-listen:is([data-state="loading"], [data-state="playing"]) .listen-play-icon { display: none; }
+.hero-listen[data-state="playing"] .listening-icon { display: block; }
+.hero-listen[data-state="loading"] .button-icon::after {
+  content: ''; width: .9em; aspect-ratio: 1; border: 2px solid #ffffff45;
+  border-top-color: #fff; border-radius: 50%; animation: listen-spin .75s linear infinite;
+}
+@keyframes listen-spin { to { transform: rotate(360deg); } }
 .hero-moods { color: #d0ccd7; padding: .9em 1.18em; border-color: #ffffff1a; text-decoration: none; font-weight: 400; }
 .hero-moods svg { color: #d0bcff; flex-shrink: 0; }
 .hero-moods:hover { color: #fff; border-color: #b29afa82; background: #b29afa13; }
@@ -909,8 +917,11 @@ i.mood-name { font-style: italic; }
           <p class="hero-sub">Pick a station. Press play. Stay a while. Eleven handpicked live stations, from ’70s grooves to world news, are one tap away.</p>
           <div class="hero-buttons">
             <button class="hero-listen" id="heroListen" type="button">
-              <span class="button-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 4.8v14.4L20 12z"/></svg></span>
-              Start listening
+              <span class="button-icon" aria-hidden="true">
+                <svg class="listen-play-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 4.8v14.4L20 12z"/></svg>
+                <svg class="listening-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 9v6m5-10v14m5-10v6"/></svg>
+              </span>
+              <span id="heroListenLabel">Start listening</span>
             </button>
             <a class="hero-moods" href="#moods">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h2c3 0 4 2 7 6s4 6 7 6h2m-3-3 3 3-3 3M3 18h2c3 0 4-2 7-6s4-6 7-6h2m-3-3 3 3-3 3"/></svg>
@@ -1442,29 +1453,31 @@ function setStationArtwork(station, art, image, placeholder) {
   placeholder.textContent = station.emoji;
 }
 
-function revealPlayer() {
+function revealPlayer(align = false) {
   player.focus({ preventScroll: true });
   const bounds = player.getBoundingClientRect();
-  if (bounds.top < siteHeader.offsetHeight || bounds.bottom > window.innerHeight) {
+  if (align || bounds.top < siteHeader.offsetHeight || bounds.bottom > window.innerHeight) {
     player.scrollIntoView({ block: 'start' });
   }
 }
 
-function tuneAndReveal(station, animation) {
+function tuneAndReveal({ station, animation, align = false } = {}) {
   const stationId = station?.id ?? currentId;
   if (stationId !== currentId) loadStation(station);
   else if (!isPlaying && document.body.dataset.playback !== 'loading') doPlay();
   if (animation) {
     animation.finished.then(() => {
-      if (currentId === stationId) revealPlayer();
+      if (currentId === stationId) revealPlayer(align);
     }, () => {});
   } else {
-    revealPlayer();
+    revealPlayer(align);
   }
 }
 
 document.getElementById('navListen').addEventListener('click', () => tuneAndReveal());
-document.getElementById('heroListen').addEventListener('click', () => tuneAndReveal());
+const heroListen = document.getElementById('heroListen');
+const heroListenLabel = document.getElementById('heroListenLabel');
+heroListen.addEventListener('click', () => tuneAndReveal({ align: true }));
 function initStationBanner() {
   const strip = document.getElementById('stationStrip');
   const viewport = strip.querySelector('.station-strip-window');
@@ -1508,7 +1521,8 @@ function initStationBanner() {
   track.addEventListener('click', event => {
     const stationButton = event.target.closest('[data-featured-station]');
     if (!stationButton) return;
-    tuneAndReveal(STATIONS.find(station => station.id === Number(stationButton.dataset.featuredStation)));
+    const station = STATIONS.find(station => station.id === Number(stationButton.dataset.featuredStation));
+    tuneAndReveal({ station });
   });
 }
 initStationBanner();
@@ -1518,6 +1532,13 @@ let connectionTimer;
 function setPlaybackStatus(text, state = 'ready') {
   document.querySelectorAll('.playback-status').forEach(el => el.textContent = text);
   document.body.dataset.playback = state;
+  heroListen.dataset.state = state;
+  heroListenLabel.textContent = {
+    loading: 'Connecting…',
+    playing: 'Listening now',
+    paused: 'Resume listening',
+    error: 'Try again'
+  }[state] ?? 'Start listening';
   syncStationControls();
   refreshWave();
 }
@@ -1785,11 +1806,12 @@ muteButton.addEventListener('click', () => {
 
 document.getElementById('surpriseMe').addEventListener('click', () => {
   const music = STATIONS.filter(s => s.id <= 9 && s.id !== currentId);
-  tuneAndReveal(music[Math.floor(Math.random() * music.length)]);
+  tuneAndReveal({ station: music[Math.floor(Math.random() * music.length)] });
 });
 document.querySelectorAll('.mood').forEach(btn => btn.addEventListener('click', () => {
   const animation = moveRecord(moodRecord, btn);
-  tuneAndReveal(STATIONS.find(s => s.id === Number(btn.dataset.station)), animation);
+  const station = STATIONS.find(s => s.id === Number(btn.dataset.station));
+  tuneAndReveal({ station, animation });
 }));
 // Keep keyboard focus inside either open dialog.
 document.addEventListener('keydown', event => {
