@@ -1,10 +1,10 @@
-/* Nimbus Radio — app shell v3.1.2 */
+/* Nimbus Radio — app shell v3.1.3 */
 const CACHE_PREFIX = 'nimbus-radio-';
-const CACHE_NAME = `${CACHE_PREFIX}v3.1.2`;
+const CACHE_NAME = `${CACHE_PREFIX}v3.1.3`;
 const isRedirectHost = self.location.hostname === 'nimbusradio.app';
 const SHELL = [
   './', './manifest.json',
-  './icons/icon-192.png', './icons/icon-512.png',
+  './icons/icon-192.png', './icons/icon-512.png', './icons/nimbus-wave.png',
   './apple-touch-icon.png', './favicon-32.png'
 ].map(path => new URL(path, self.registration.scope).href);
 // Static hosts redirect index.html to the directory URL. Cache that canonical URL.
