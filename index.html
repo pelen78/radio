@@ -663,6 +663,7 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   right: -16%; bottom: -27%; border: 1px solid #ffffff37; border-radius: 50%;
 }
 .station-card-art::after { width: 37%; right: -7%; bottom: -11%; border-color: #ffffff28; }
+.station-card-art .vinyl-record { top: 12%; right: 12%; width: 38%; max-width: 88%; max-height: 76%; }
 [data-tone="amber"] { --card-start: #ffc348; --card-mid: #f87513; --card-end: #e91c55; }
 [data-tone="violet"] { --card-start: #d953e7; --card-mid: #932ee0; --card-end: #4339ca; }
 [data-tone="blue"] { --card-start: #65efdd; --card-mid: #04aecb; --card-end: #1949c6; }
@@ -773,8 +774,10 @@ i.mood-name { font-style: italic; }
   border-block: 7px solid #ffd5ab5c; box-shadow: 0 9px 24px #ffca9d38;
 }
 .mood-nostalgia { --mood-accent: #ffd0ee; --mood-art: linear-gradient(135deg, #f077c0, #7920bd 47%, #240a46); }
-.mood-nostalgia::before {
-  top: 13%; left: 50%; width: 62%; aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%;
+.mood .vinyl-record { top: 13%; inset-inline: 0; width: 62%; margin-inline: auto; }
+.mood:has(> .vinyl-record)::before, .mood:has(> .vinyl-record)::after { visibility: hidden; }
+.vinyl-record {
+  position: absolute; z-index: -1; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
   background:
     radial-gradient(circle, #0b0910 0 3%, transparent 3.6%),
     radial-gradient(circle, #bc9997 0 21%, transparent 22%),
@@ -1012,6 +1015,7 @@ i.mood-name { font-style: italic; }
             <span class="mood-copy"><span class="mood-name">Energy</span><span class="mood-caption">Turn it up</span></span>
           </button>
           <button class="mood mood-nostalgia" data-station="2" type="button">
+            <span class="vinyl-record" id="moodRecord" aria-hidden="true"></span>
             <span class="mood-icon" aria-hidden="true">◉</span>
             <span class="mood-copy"><i class="mood-name">Nostalgia</i><span class="mood-caption">Back to the good days</span></span>
           </button>
@@ -1317,7 +1321,11 @@ function renderStationCards() {
     });
     item.append(button);
     grid.append(item);
-    return {station, group, category, item, button, title: `${title} ${accent}`, status: button.querySelector('.station-card-category')};
+    return {
+      station, group, category, item, button, title: `${title} ${accent}`,
+      artwork: button.querySelector('.station-card-art'),
+      status: button.querySelector('.station-card-category')
+    };
   });
 
   ['All', ...CATEGORY_GROUPS.map(group => group.name)].forEach(name => {
@@ -1342,6 +1350,24 @@ function renderStationCards() {
 }
 
 const stationCards = renderStationCards();
+const stationRecord = document.createElement('span');
+stationRecord.className = 'vinyl-record';
+stationRecord.setAttribute('aria-hidden', 'true');
+const moodRecord = document.getElementById('moodRecord');
+
+function moveRecord(record, target) {
+  if (record.parentElement === target) return;
+  const wasPlaced = Boolean(record.parentElement);
+  record.getAnimations().forEach(animation => animation.cancel());
+  target.append(record);
+  if (wasPlaced && !reducedMotion.matches) {
+    return record.animate([
+      { transform: 'scale(.82) rotate(-22deg)', opacity: .45 },
+      { transform: 'scale(1) rotate(0)', opacity: 1 }
+    ], { duration: 240, easing: 'ease-out' });
+  }
+}
+
 function syncStationControls() {
   const currentStation = STATIONS.find(s => s.id === currentId);
   const playback = document.body.dataset.playback;
@@ -1384,6 +1410,7 @@ function loadStation(s, autoplay = true) {
   document.querySelectorAll(".mood").forEach(b => b.setAttribute("aria-pressed", Number(b.dataset.station) === s.id));
   featuredButtons.forEach(b => b.setAttribute('aria-pressed', Number(b.dataset.featuredStation) === s.id));
   currentId = s.id;
+  moveRecord(stationRecord, stationCards.find(card => card.station === s).artwork);
   const artEl = document.querySelector('.pc-art');
   const isRelax = s.id === 7;
   setStationArtwork(s, artEl, document.getElementById('pcImg'), document.getElementById('pcEmoji'));
@@ -1423,22 +1450,21 @@ function revealPlayer() {
   }
 }
 
-function startListening() {
-  if (!isPlaying && document.body.dataset.playback !== 'loading') doPlay();
-  revealPlayer();
-}
-
-function tuneAndReveal(station) {
-  if (station.id === currentId) {
-    startListening();
-    return;
+function tuneAndReveal(station, animation) {
+  const stationId = station?.id ?? currentId;
+  if (stationId !== currentId) loadStation(station);
+  else if (!isPlaying && document.body.dataset.playback !== 'loading') doPlay();
+  if (animation) {
+    animation.finished.then(() => {
+      if (currentId === stationId) revealPlayer();
+    }, () => {});
+  } else {
+    revealPlayer();
   }
-  loadStation(station);
-  revealPlayer();
 }
 
-document.getElementById('navListen').addEventListener('click', startListening);
-document.getElementById('heroListen').addEventListener('click', startListening);
+document.getElementById('navListen').addEventListener('click', () => tuneAndReveal());
+document.getElementById('heroListen').addEventListener('click', () => tuneAndReveal());
 function initStationBanner() {
   const strip = document.getElementById('stationStrip');
   const viewport = strip.querySelector('.station-strip-window');
@@ -1762,7 +1788,8 @@ document.getElementById('surpriseMe').addEventListener('click', () => {
   tuneAndReveal(music[Math.floor(Math.random() * music.length)]);
 });
 document.querySelectorAll('.mood').forEach(btn => btn.addEventListener('click', () => {
-  tuneAndReveal(STATIONS.find(s => s.id === Number(btn.dataset.station)));
+  const animation = moveRecord(moodRecord, btn);
+  tuneAndReveal(STATIONS.find(s => s.id === Number(btn.dataset.station)), animation);
 }));
 // Keep keyboard focus inside either open dialog.
 document.addEventListener('keydown', event => {
