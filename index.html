@@ -324,14 +324,14 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
   footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px 20px; }
 }
 
-.cats,.fp-cats { display:flex;flex-direction:column;gap:0; }
+.fp-cats { display:flex;flex-direction:column;gap:0; }
 .category-group { display:grid;grid-template-columns:98px minmax(0,1fr);align-items:start;gap:16px;padding:16px 0;border-top:1px solid var(--border); }
 .category-group:first-child { border-top:0;padding-top:0; }
 .category-heading { padding-top:14px;color:var(--muted);font:400 .64rem var(--fm); }
 .category-options { display:flex;flex-wrap:wrap;gap:9px; }
-.cat,.fp-cat { display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:0;padding:11px 17px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:#d0cada;font:500 .77rem var(--fd);line-height:1.35;white-space:nowrap; }
-.cat.active,.fp-cat.active { background:#b091df12;border-color:#b091df;color:#e8d9fc;box-shadow:none; }
-.cat.is-playing,.fp-cat.is-playing { background:#83ded414;border-color:#83ded4;color:#b1f0e7; }
+.fp-cat { display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:0;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:#d0cada;font:500 .67rem var(--fd);line-height:1.35;white-space:nowrap; }
+.fp-cat.active { background:#b091df12;border-color:#b091df;color:#e8d9fc;box-shadow:none; }
+.fp-cat.is-playing { background:#83ded414;border-color:#83ded4;color:#b1f0e7; }
 .cat-indicator { width:12px;height:14px;display:flex;align-items:center;justify-content:center;gap:2px;flex-shrink:0; }
 .cat-indicator i { display:block;width:3px;height:3px;border-radius:2px;background:currentColor;opacity:.45; }
 .cat-indicator i:not(:first-child) { display:none; }
@@ -344,7 +344,6 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
 .fp-cats { padding-bottom:18px; }
 .fp-cats .category-group { grid-template-columns:65px minmax(0,1fr);gap:10px;padding-block:12px; }
 .fp-cats .category-heading { font-size:.56rem; }
-.fp-cat { font-size:.67rem;padding:10px 12px; }
 @media (max-width: 800px) {
   .category-group { grid-template-columns: 76px minmax(0, 1fr); gap: 12px; }
 }
@@ -352,7 +351,6 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
   .category-group, .fp-cats .category-group { grid-template-columns: 1fr; gap: 9px; }
   .category-heading, .fp-cats .category-heading { padding-top: 0; }
   .category-options { gap: 7px; }
-  .cat { padding-inline: 13px; }
   .fp-cats { padding-inline: 20px; }
 }
 
@@ -396,11 +394,7 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   color: var(--text); white-space: nowrap; font: 400 clamp(25px, 1.75vw, 33px)/1 var(--display);
 }
 .brand i { color: var(--muted); }
-.brand-mark {
-  display: grid; place-items: center; width: clamp(35px, 2.8vw, 52px); aspect-ratio: 1;
-  border: 1.5px solid transparent; border-radius: 43%;
-  background: linear-gradient(#0b0911, #0b0911) padding-box, linear-gradient(125deg, #c23af4 42%, #5de6df) border-box;
-}
+.brand-wave { display: block; width: clamp(49px, 4.3vw, 80px); height: auto; }
 .site-links, .nav-actions, .hero-buttons { display: flex; align-items: center; }
 .site-links { gap: clamp(16px, 2.5vw, 46px); list-style: none; }
 .site-links a {
@@ -592,14 +586,111 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 .station-strip button i { color: #aaa4b2; }
 .station-strip button:hover, .station-strip button:hover i { color: var(--aqua); }
 
+.station-section {
+  width: min(92%, 1644px); margin-inline: auto;
+  padding: clamp(52px, 8.4vw, 150px) clamp(12px, 2.45vw, 44px) clamp(42px, 4vw, 70px);
+  scroll-margin-top: var(--header-height);
+  background: linear-gradient(160deg, #100e1e, #0e0d1a 58%, #100e1c);
+}
+.station-heading {
+  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between;
+  column-gap: 24px; row-gap: 19px; margin-bottom: clamp(27px, 3.5vw, 63px);
+}
+.station-kicker {
+  color: #c0a9e7; font: 400 clamp(10px, .75vw, 13px)/1.5 var(--fm);
+  letter-spacing: .24em; text-transform: uppercase; margin-bottom: clamp(12px, 1.35vw, 23px);
+}
+.station-heading h2 { font: 400 clamp(43px, 4.4vw, 80px)/1 var(--display); letter-spacing: -.015em; }
+.station-heading h2 i { color: #ada7b6; }
+.station-hint {
+  color: var(--muted); margin-top: clamp(11px, 1.3vw, 23px);
+  font: 400 clamp(15px, 1.15vw, 21px)/1.55 var(--fd);
+}
+.station-filters {
+  display: flex; align-items: center; gap: 4px; max-width: 100%; padding: 5px;
+  border: 1px solid #ffffff15; border-radius: 999px; background: #ffffff06;
+}
+.station-filters button {
+  display: inline-flex; align-items: center; justify-content: center; gap: .55em;
+  min-height: 44px; padding-inline: clamp(9px, 1.3vw, 24px); border: 0; border-radius: 999px;
+  background: transparent; color: #cdc7d5; font: 400 clamp(13px, 1.03vw, 18px) var(--fd); cursor: pointer;
+  transition: color .18s, background-color .18s;
+}
+.station-filters button:hover { background: #ffffff11; color: #fff; }
+.station-filters button[aria-pressed=true] { background: #fff; color: #100d18; }
+.station-filters button:focus-visible { outline-offset: 1px; }
+.station-filters small { font: 400 .72em var(--fm); opacity: .76; }
+.station-grid {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(11px, 1.45vw, 26px); list-style: none;
+}
+.station-card {
+  display: grid; width: 100%; height: 100%; gap: clamp(9px, .8vw, 14px);
+  padding: clamp(7px, .8vw, 14px); text-align: left; cursor: pointer;
+  border: 1px solid #ffffff16; border-radius: clamp(17px, 1.9vw, 34px);
+  background: linear-gradient(155deg, #ffffff04, #ffffff06); color: var(--text);
+  transition: border-color .2s, box-shadow .2s, background-color .2s;
+}
+.station-card:hover { background-color: #ffffff08; border-color: #b29afa68; }
+.station-card[aria-current=true] { border-color: #63e7d567; box-shadow: 0 8px 32px #63e7d513; background-color: #63e7d509; }
+.station-card-art {
+  position: relative; display: flex; align-items: end; overflow: hidden; isolation: isolate;
+  min-width: 0; aspect-ratio: 1.85; padding: clamp(8px, 1vw, 19px); border-radius: clamp(12px, 1.4vw, 25px);
+  background:
+    radial-gradient(ellipse at 24% 17%, #ffffff52, transparent 58%),
+    radial-gradient(ellipse at 7% 116%, #0b091c47, transparent 59%),
+    linear-gradient(140deg, var(--card-start), var(--card-mid) 55%, var(--card-end));
+  color: #fff; font: italic 400 clamp(28px, 3.5vw, 64px)/1 var(--display);
+  text-shadow: 0 1px 5px #09051f75;
+}
+.station-card-art::before, .station-card-art::after {
+  content: ''; position: absolute; z-index: -1; width: 62%; aspect-ratio: 1;
+  right: -16%; bottom: -27%; border: 1px solid #ffffff37; border-radius: 50%;
+}
+.station-card-art::after { width: 37%; right: -7%; bottom: -11%; border-color: #ffffff28; }
+[data-tone="amber"] { --card-start: #ffc348; --card-mid: #f87513; --card-end: #e91c55; }
+[data-tone="violet"] { --card-start: #d953e7; --card-mid: #932ee0; --card-end: #4339ca; }
+[data-tone="blue"] { --card-start: #65efdd; --card-mid: #04aecb; --card-end: #1949c6; }
+[data-tone="pink"] { --card-start: #ffacd5; --card-mid: #ff7194; --card-end: #7a38e3; }
+[data-tone="flame"] { --card-start: #ff829a; --card-mid: #ef3b39; --card-end: #fb7219; }
+[data-tone="gold"] { --card-start: #f5ead3; --card-mid: #f2d57b; --card-end: #a96b14; }
+[data-tone="indigo"] { --card-start: #b597fa; --card-mid: #655be7; --card-end: #24c4b5; }
+[data-tone="green"] { --card-start: #bdf272; --card-mid: #12b489; --card-end: #078ba9; }
+[data-tone="rose"] { --card-start: #f294c0; --card-mid: #d84b84; --card-end: #7c275b; }
+[data-tone="slate"] { --card-start: #a4bed5; --card-mid: #486a9e; --card-end: #2c3c76; }
+[data-tone="plum"] { --card-start: #d0a3db; --card-mid: #955abc; --card-end: #563279; }
+.station-card-info { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 6px; padding: 1px clamp(1px, .55vw, 10px) clamp(3px, .55vw, 10px); }
+.station-card-copy { display: grid; gap: 5px; min-width: 0; }
+.station-card-category {
+  color: #aaa2b5; font: 400 clamp(9px, .67vw, 12px)/1.35 var(--fm);
+  text-transform: uppercase; letter-spacing: .14em;
+}
+.station-card-title { font: 500 clamp(14px, 1.29vw, 23px)/1.1 var(--fd); overflow-wrap: anywhere; }
+.station-card-title i { font: italic 400 1.17em/1 var(--display); color: #d2c9dc; }
+.station-card-control {
+  display: grid; place-items: center; flex: 0 0 auto; width: clamp(31px, 2.85vw, 51px); aspect-ratio: 1;
+  border-radius: 50%; background: #ffffff0d; color: #e3dfeb;
+}
+.station-card:hover .station-card-control { background: #ffffff1a; }
+.station-card.is-playing .station-card-control { background: var(--spectrum); color: #100e1a; }
+.station-card .station-card-pause, .station-card .station-card-level { display: none; }
+.station-card.is-playing .station-card-play, .station-card[data-state="loading"] .station-card-play { display: none; }
+.station-card.is-playing .station-card-pause, .station-card[data-state="loading"] .station-card-pause { display: block; }
+.station-card-level {
+  position: absolute; top: 9%; right: 6%; border-radius: 999px; padding: 4px 8px;
+  background: #15122ebd; color: #fff;
+}
+.station-card.is-playing .station-card-level { display: flex; }
+.station-card.is-playing .station-card-level i { width: 2px; }
+.station-card[data-state="loading"] .station-card-category { color: var(--aqua); }
+.station-card[data-state="error"] .station-card-category { color: #ffb5b5; }
+
 .discovery { padding-block: clamp(44px, 5vw, 90px); }
 .discovery > section { scroll-margin-top: calc(var(--header-height) + 24px); }
 .discovery > section + section { margin-top: clamp(32px, 4vw, 60px); padding-top: clamp(28px, 3vw, 52px); border-top: 1px solid var(--border); }
 .discovery h2 { font: 400 clamp(34px, 4vw, 66px)/1.05 var(--display); }
-.discovery .station-hint, .discovery .mood-hint, .how-section p { font: 400 clamp(15px, 1.15vw, 19px)/1.55 var(--fd); }
-.station-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 18px; }
-.station-total { font: 400 12px/1.25 var(--fm); color: var(--aqua); padding: 7px 10px; border: 1px solid #63e7d535; border-radius: 999px; }
-.station-hint, .mood-hint { color: var(--muted); margin: 9px 0 24px; }
+.discovery .mood-hint, .how-section p { font: 400 clamp(15px, 1.15vw, 19px)/1.55 var(--fd); }
+.mood-hint { color: var(--muted); margin: 9px 0 24px; }
 .mood-section { position: relative; }
 .mood-actions { position: absolute; top: clamp(28px, 3vw, 52px); right: 0; }
 .surprise-button {
@@ -628,6 +719,9 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   .live-count { display: none; }
   .pc-feature { left: -12%; }
 }
+@media (max-width: 950px) {
+  .station-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 @media (max-width: 820px) {
   :root { --header-height: 112px; }
   .site-nav { grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; min-height: var(--header-height); padding-top: 8px; }
@@ -639,6 +733,12 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
   .pc-feature { left: -5%; }
   .station-strip ul { justify-content: flex-start; }
   .moods { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .station-section { width: calc(100% - 16px); }
+  .station-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .station-card { grid-template-rows: auto 1fr; }
+  .station-card-art { font-size: clamp(25px, 7vw, 36px); }
 }
 @media (max-width: 450px) {
   .hero-grid { gap: 38px; }
@@ -661,7 +761,7 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 }
 @media (max-width: 360px) {
   .brand { font-size: 23px; gap: 7px; }
-  .brand-mark { width: 29px; }
+  .brand-wave { width: 38px; }
   .nav-listen { font-size: 13px; padding-left: .85em; }
   .site-nav { column-gap: 8px; }
 }
@@ -673,7 +773,7 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
 <div class="page">
   <header class="site-header" id="siteHeader">
     <nav class="site-nav site-width" aria-label="Main navigation">
-      <a class="brand" href="#main"><span class="brand-mark" aria-hidden="true"></span><span>Nimbus <i>Radio</i></span></a>
+      <a class="brand" href="#main"><img class="brand-wave" src="icons/nimbus-wave.png" width="240" height="109" alt=""><span>Nimbus <i>Radio</i></span></a>
       <ul class="site-links">
         <li><a href="#radio">Stations</a></li>
         <li><a href="#moods">Moods</a></li>
@@ -775,12 +875,19 @@ body[data-playback=playing] .pc-eq, body[data-playback=playing] .fp-eq { filter:
       </ul>
     </div>
 
+    <section class="station-section" id="radio" aria-labelledby="stationHeading">
+      <div class="station-heading">
+        <div>
+          <p class="station-kicker">Stations</p>
+          <h2 id="stationHeading">Choose a <i>station.</i></h2>
+          <p class="station-hint">Your favorites, from every decade. One tap to tune in.</p>
+        </div>
+        <div class="station-filters" id="stationFilters" role="group" aria-label="Filter stations"></div>
+      </div>
+      <ul class="station-grid" id="stationGrid" aria-label="Radio stations"></ul>
+    </section>
+
     <div class="discovery site-width">
-      <section class="station-section" id="radio" aria-labelledby="stationHeading">
-        <div class="station-heading"><h2 id="stationHeading">Choose a station</h2><span class="station-total"><span data-station-count>11</span> live stations</span></div>
-        <p class="station-hint">Explore by decade, genre, or language.</p>
-        <div class="cats" id="cats"></div>
-      </section>
       <section class="mood-section" id="moods" aria-labelledby="moodHeading">
         <h2 id="moodHeading">Pick by mood</h2>
         <p class="mood-hint">Find a station for how you want to feel.</p>
@@ -980,24 +1087,37 @@ function refreshWave() {
 reducedMotion.addEventListener('change', refreshWave);
 document.addEventListener('visibilitychange', refreshWave);
 
-// Keep the same station order in the dial and expanded player.
+// Share station groups between the catalog filters and expanded player.
 const CATEGORY_GROUPS = [
   {name:'Decades', categories:CATS.slice(0,4)},
   {name:'Music', categories:CATS.slice(4,9)},
   {name:'News', categories:CATS.slice(9)}
 ];
+const CARD_DISPLAY = {
+  1: ['70s', 'Groove', 'Seventies', 'amber'],
+  2: ['80s', 'Neon', 'Eighties', 'violet'],
+  3: ['90s', 'Nineties', 'Mixtape', 'blue'],
+  4: ['00s', 'Y2K', 'Pop', 'pink'],
+  5: ['Hits', 'Top', 'Hits', 'flame'],
+  6: ['Classical', 'Classical', 'Hall', 'gold'],
+  7: ['Relax', 'PurePlay', 'Relax', 'indigo'],
+  8: ['Electronic', 'Pulse', 'Electronic', 'green'],
+  9: ['Español', 'Los 40', 'Español', 'rose'],
+  10: ['News', 'NPR', 'News', 'slate'],
+  11: ['Noticias', 'RFI', 'en Español', 'plum']
+};
 const SHORT_LABELS = {
   '70s Music':'70s', '80s Music':'80s', '90s Music':'90s', '00s Music':'00s',
   "Today's Top Hits":'Hits', 'Classical & Instrumental':'Classical',
   'Relax Music':'Relax', 'Electronic Music':'Electronic',
   'Música en Español':'Español', 'Noticias ES':'Español', 'News':'English'
 };
-function renderCategories(container, expanded = false) {
+function renderCategories(container) {
   CATEGORY_GROUPS.forEach((group, index) => {
     const section = document.createElement('section');
     section.className = 'category-group';
     const heading = document.createElement('h3');
-    heading.id = `${expanded ? 'full' : 'dial'}-group-${index}`;
+    heading.id = `full-group-${index}`;
     heading.className = 'category-heading';
     heading.textContent = group.name;
     section.setAttribute('aria-labelledby', heading.id);
@@ -1006,7 +1126,8 @@ function renderCategories(container, expanded = false) {
     list.className = 'category-options';
     group.categories.forEach(cat => {
       const btn = document.createElement('button');
-      btn.className = expanded ? 'fp-cat' : 'cat';
+      btn.type = 'button';
+      btn.className = 'fp-cat';
       btn.dataset.label = cat.label;
       btn.setAttribute('aria-pressed','false');
       btn.setAttribute('aria-label', cat.label);
@@ -1021,14 +1142,95 @@ function renderCategories(container, expanded = false) {
     container.appendChild(section);
   });
 }
-renderCategories(document.getElementById('cats'));
-function syncCategoryPlayback() {
-  const station = STATIONS.find(s => s.id === currentId);
-  const live = isPlaying && document.body.dataset.playback === 'playing';
-  document.querySelectorAll('.cat, .fp-cat').forEach(btn => {
-    const playing = live && btn.dataset.label === station?.genre;
+
+function renderStationCards() {
+  const grid = document.getElementById('stationGrid');
+  const filters = document.getElementById('stationFilters');
+  const cards = STATIONS.map(station => {
+    const group = CATEGORY_GROUPS.find(({categories}) => categories.some(cat => cat.fn(station))).name;
+    const category = group === 'Decades' ? 'Decade' : group;
+    const [label, title, accent, tone] = CARD_DISPLAY[station.id];
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'station-card';
+    button.innerHTML = `
+      <span class="station-card-art" data-tone="${tone}" aria-hidden="true">
+        ${label}
+        <span class="station-card-level cat-indicator"><i></i><i></i><i></i></span>
+      </span>
+      <span class="station-card-info">
+        <span class="station-card-copy">
+          <span class="station-card-category">${category}</span>
+          <span class="station-card-title">${title} <i>${accent}</i></span>
+        </span>
+        <span class="station-card-control" aria-hidden="true">
+          <svg class="station-card-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 4.8v14.4L20 12z"/></svg>
+          <svg class="station-card-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>
+        </span>
+      </span>`;
+    button.addEventListener('click', () => {
+      if (currentId !== station.id) loadStation(station);
+      else if (isPlaying || document.body.dataset.playback === 'loading') doPause();
+      else doPlay();
+    });
+    item.append(button);
+    grid.append(item);
+    return {station, group, category, item, button, title: `${title} ${accent}`, status: button.querySelector('.station-card-category')};
+  });
+
+  ['All', ...CATEGORY_GROUPS.map(group => group.name)].forEach(name => {
+    const matchingCards = name === 'All' ? cards : cards.filter(card => card.group === name);
+    const button = document.createElement('button');
+    const count = document.createElement('small');
+    button.type = 'button';
+    button.textContent = name;
+    count.textContent = matchingCards.length;
+    button.append(' ', count);
+    button.setAttribute('aria-controls', grid.id);
+    button.setAttribute('aria-pressed', name === 'All');
+    button.addEventListener('click', () => {
+      filters.querySelector('[aria-pressed=true]').setAttribute('aria-pressed', 'false');
+      button.setAttribute('aria-pressed', 'true');
+      cards.forEach(card => card.item.hidden = name !== 'All' && card.group !== name);
+    });
+    filters.append(button);
+  });
+
+  return cards;
+}
+
+const stationCards = renderStationCards();
+function syncStationControls() {
+  const currentStation = STATIONS.find(s => s.id === currentId);
+  const playback = document.body.dataset.playback;
+  const live = isPlaying && playback === 'playing';
+  document.querySelectorAll('.fp-cat').forEach(btn => {
+    const playing = live && btn.dataset.label === currentStation?.genre;
     btn.classList.toggle('is-playing', playing);
     btn.setAttribute('aria-label', btn.dataset.label + (playing ? ', playing live' : ''));
+  });
+  stationCards.forEach(({station, button, category, title, status}) => {
+    const current = station.id === currentId;
+    const state = current ? playback : '';
+    const playing = current && live;
+    button.setAttribute('aria-current', current);
+    button.dataset.state = state;
+    button.classList.toggle('is-playing', playing);
+    let action = 'Play';
+    let note = category;
+    if (state === 'loading') {
+      action = 'Cancel tuning to';
+      note = 'Tuning in…';
+    } else if (state === 'error') {
+      action = 'Retry';
+      note = 'Couldn’t connect';
+    } else if (playing) {
+      action = 'Pause';
+      note = 'On air';
+    }
+    button.setAttribute('aria-label', `${action} ${title}`);
+    status.textContent = note;
   });
 }
 
@@ -1038,11 +1240,6 @@ function loadStation(s, autoplay = true) {
   audio.pause();
   isPlaying = false;
   syncPlayIcons();
-  document.querySelectorAll(".cat").forEach(b => {
-    const selected = b.dataset.label === s.genre;
-    b.classList.toggle("active", selected);
-    b.setAttribute("aria-pressed", selected);
-  });
   document.querySelectorAll(".mood").forEach(b => b.setAttribute("aria-pressed", Number(b.dataset.station) === s.id));
   featuredButtons.forEach(b => b.setAttribute('aria-pressed', Number(b.dataset.featuredStation) === s.id));
   currentId = s.id;
@@ -1099,7 +1296,7 @@ let connectionTimer;
 function setPlaybackStatus(text, state = 'ready') {
   document.querySelectorAll('.playback-status').forEach(el => el.textContent = text);
   document.body.dataset.playback = state;
-  syncCategoryPlayback();
+  syncStationControls();
   refreshWave();
 }
 function playbackFailed() {
@@ -1140,7 +1337,7 @@ function doPause() {
   syncPlayIcons();
 }
 function syncPlayIcons() {
-  syncCategoryPlayback();
+  syncStationControls();
   refreshWave();
   ['iPlay', 'fpIPlay'].forEach(id => document.getElementById(id).style.display = isPlaying ? 'none' : '');
   ['iPause', 'fpIPause'].forEach(id => document.getElementById(id).style.display = isPlaying ? '' : 'none');
@@ -1150,23 +1347,13 @@ function syncPlayIcons() {
 
 document.getElementById('btnPlay').onclick = () => { isPlaying ? doPause() : doPlay(); };
 
-document.getElementById('btnNext').onclick = () => {
+function shiftStation(direction) {
   const i = STATIONS.findIndex(s => s.id === currentId);
-  const next = STATIONS[(i+1) % STATIONS.length];
-  // update active cat button
-  document.querySelectorAll('.cat').forEach(b => {
-    b.classList.toggle('active', b.dataset.label === next.genre);
-  });
-  loadStation(next);
-};
-document.getElementById('btnPrev').onclick = () => {
-  const i = STATIONS.findIndex(s => s.id === currentId);
-  const prev = STATIONS[(i-1+STATIONS.length) % STATIONS.length];
-  document.querySelectorAll('.cat').forEach(b => {
-    b.classList.toggle('active', b.dataset.label === prev.genre);
-  });
-  loadStation(prev);
-};
+  loadStation(STATIONS[(i + direction + STATIONS.length) % STATIONS.length]);
+}
+
+document.getElementById('btnNext').onclick = () => shiftStation(1);
+document.getElementById('btnPrev').onclick = () => shiftStation(-1);
 
 // Playback state follows the media element, including mobile interruptions.
 audio.addEventListener('playing', () => {
@@ -1192,14 +1379,7 @@ audio.addEventListener('timeupdate', () => {
   if (playerTime.textContent !== time) playerTime.textContent = time;
 });
 
-audio.addEventListener('ended', () => {
-  const i = STATIONS.findIndex(s => s.id === currentId);
-  const next = STATIONS[(i+1) % STATIONS.length];
-  document.querySelectorAll('.cat').forEach(b => {
-    b.classList.toggle('active', b.dataset.label === next.genre);
-  });
-  loadStation(next);
-});
+audio.addEventListener('ended', () => shiftStation(1));
 
 // volume
 const vol = document.getElementById('vol');
@@ -1309,7 +1489,7 @@ muteButton.addEventListener('click', () => {
     b.style.height = '4px';
     fpEqEl.appendChild(b);
   }
-  renderCategories(fpCatsEl, true);
+  renderCategories(fpCatsEl);
 
   // syncModalFn — called by loadStation on every station change
   window.syncModalFn = function(s) {
@@ -1383,23 +1563,8 @@ muteButton.addEventListener('click', () => {
     isPlaying ? doPause() : doPlay();
   });
 
-  // Next / Prev — call directly, loadStation will syncModalFn
-  fpNextBtn.addEventListener('click', () => {
-    const i = STATIONS.findIndex(s => s.id === currentId);
-    const next = STATIONS[(i + 1) % STATIONS.length];
-    document.querySelectorAll('.cat').forEach(b => {
-      b.classList.toggle('active', b.dataset.label === next.genre);
-    });
-    loadStation(next);
-  });
-  fpPrevBtn.addEventListener('click', () => {
-    const i = STATIONS.findIndex(s => s.id === currentId);
-    const prev = STATIONS[(i - 1 + STATIONS.length) % STATIONS.length];
-    document.querySelectorAll('.cat').forEach(b => {
-      b.classList.toggle('active', b.dataset.label === prev.genre);
-    });
-    loadStation(prev);
-  });
+  fpNextBtn.addEventListener('click', () => shiftStation(1));
+  fpPrevBtn.addEventListener('click', () => shiftStation(-1));
 
 })();
 
